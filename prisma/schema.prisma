@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Goal {
+  id          String    @id @default(cuid())
+  name        String
+  category    String
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  plans       Plan[]
+  tasks       Task[]
+  notes       Note[]
+}
+
+model Plan {
+  id          String    @id @default(cuid())
+  goalId      String
+  goal        Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tasks       Task[]
+}
+
+model Task {
+  id          String         @id @default(cuid())
+  goalId      String
+  goal        Goal           @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  planId      String?
+  plan        Plan?          @relation(fields: [planId], references: [id], onDelete: SetNull)
+  title       String
+  targetDate  DateTime?
+  done        Boolean        @default(false)
+  isRecurring Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  instances   TaskInstance[]
+  timeBlocks  TimeBlock[]
+}
+
+model TaskInstance {
+  id          String      @id @default(cuid())
+  taskId      String
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  date        DateTime
+  done        Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  timeBlocks  TimeBlock[]
+
+  @@unique([taskId, date])
+}
+
+model TimeBlock {
+  id             String        @id @default(cuid())
+  taskId         String?
+  task           Task?         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskInstanceId String?
+  taskInstance   TaskInstance? @relation(fields: [taskInstanceId], references: [id], onDelete: Cascade)
+  date           DateTime
+  startTime      String        // "HH:mm", e.g. "09:00"
+  endTime        String        // "HH:mm", e.g. "10:30"
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Note {
+  id          String    @id @default(cuid())
+  goalId      String?
+  goal        Goal?     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  title       String?
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}

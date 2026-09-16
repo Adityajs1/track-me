@@ -8,15 +8,16 @@ import {
   Calendar,
   Layers,
   CheckCircle2,
-  Circle,
   Plus,
   Trash2,
-  Edit2,
   Flame,
   Sparkles,
   Repeat,
   FileText,
   Clock,
+  Square,
+  CheckSquare,
+  Tag,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -102,142 +103,123 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
   const oneOffTasks = goal.tasks?.filter((t) => !t.isRecurring) || [];
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      {/* Top Bar: Navigation & Action */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to All Goals</span>
-        </button>
+    <div className="space-y-6 max-w-5xl mx-auto text-white">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center justify-between pb-3 border-b border-[#2E2E2E]">
+        <div className="flex items-center gap-2 text-xs text-white/50">
+          <button onClick={onBack} className="hover:text-white transition-colors cursor-pointer">
+            Goals
+          </button>
+          <span>/</span>
+          <span className="text-white font-medium truncate max-w-xs">{goal.name}</span>
+        </div>
 
         <button
           onClick={() => {
-            if (confirm(`Are you sure you want to delete goal "${goal.name}"?`)) {
+            if (confirm(`Delete goal "${goal.name}"? This action cannot be undone.`)) {
               onDeleteGoal(goal.id);
             }
           }}
-          className="flex items-center gap-1.5 text-xs text-rose-500 hover:text-rose-700 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 transition-colors"
         >
           <Trash2 className="h-3.5 w-3.5" />
           <span>Delete Goal</span>
         </button>
       </div>
 
-      {/* Goal Main Header */}
-      <div className="rounded-2xl border border-zinc-200/90 bg-white p-6 dark:border-zinc-800/80 dark:bg-zinc-900/50 shadow-xs">
+      {/* Goal Notion Header */}
+      <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2.5 mb-1.5">
-              <span className="rounded-md bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 rounded-md bg-[#232323] text-[#00C2CB] text-xs font-semibold border border-[#2E2E2E]">
                 {goal.category}
               </span>
-              <span className="text-xs text-zinc-400">
-                Created {format(parseISO(goal.createdAt), 'MMM d, yyyy')}
+              <span className="text-xs text-white/40">
+                Started {format(parseISO(goal.startDate), 'MMM d, yyyy')}
+                {goal.endDate ? ` · Target ${format(parseISO(goal.endDate), 'MMM d, yyyy')}` : ''}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">
               {goal.name}
             </h1>
           </div>
 
-          {/* Metrics summary */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 p-3 border border-zinc-200/60 dark:border-zinc-700/60">
-              <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                <Flame className="h-4 w-4 fill-amber-500" />
-                <div className="text-left">
-                  <div className="text-xs font-semibold leading-none">{metrics?.currentStreak || 0}d</div>
-                  <div className="text-[10px] text-zinc-400 leading-none mt-1">Streak</div>
-                </div>
-              </div>
-              <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-700 mx-1" />
-              <div className="flex items-center gap-1.5 text-zinc-800 dark:text-zinc-200">
-                <Sparkles className="h-4 w-4 text-emerald-500" />
-                <div className="text-left">
-                  <div className="text-xs font-semibold leading-none">{metrics?.totalPoints || 0}</div>
-                  <div className="text-[10px] text-zinc-400 leading-none mt-1">Points</div>
-                </div>
-              </div>
+          {/* Metrics Pill */}
+          <div className="flex items-center gap-2 bg-[#1F1F1F] p-3 rounded-xl border border-[#2E2E2E]">
+            <div className="flex items-center gap-1.5 text-[#FF4FA3] font-semibold text-xs">
+              <Flame className="h-4 w-4 fill-[#FF4FA3]" />
+              <span>{metrics?.currentStreak || 0}d streak</span>
+            </div>
+            <span className="text-[#2E2E2E]">|</span>
+            <div className="text-xs text-white/70">
+              <span className="font-bold text-[#00C2CB]">{metrics?.totalPoints || 0}</span> pts
             </div>
           </div>
         </div>
 
-        {/* Date Timeframe */}
-        <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-          <Calendar className="h-3.5 w-3.5" />
-          <span>
-            {format(parseISO(goal.startDate), 'MMM d, yyyy')}
-            {goal.endDate ? ` → ${format(parseISO(goal.endDate), 'MMM d, yyyy')}` : ' (ongoing)'}
-          </span>
-        </div>
-
-        {/* Heatmap Section */}
-        <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
+        {/* 180-day Heatmap Consistency Grid */}
+        <div className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 space-y-2">
+          <div className="text-xs font-semibold text-white/70">
             Consistency Trend (Last 180 Days)
-          </h4>
+          </div>
           <Heatmap daysSummary={daysSummary} />
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-zinc-200 dark:border-zinc-800 gap-6">
+      {/* View Tabs */}
+      <div className="flex border-b border-[#2E2E2E] gap-6 text-xs font-medium">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+          className={`pb-2.5 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'overview'
-              ? 'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100'
-              : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+              ? 'border-[#00C2CB] text-[#00C2CB] font-bold'
+              : 'border-transparent text-white/60 hover:text-white'
           }`}
         >
           Overview & Structure
         </button>
         <button
           onClick={() => setActiveTab('plans')}
-          className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+          className={`pb-2.5 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'plans'
-              ? 'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100'
-              : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+              ? 'border-[#00C2CB] text-[#00C2CB] font-bold'
+              : 'border-transparent text-white/60 hover:text-white'
           }`}
         >
           Phase Plans ({goal.plans?.length || 0})
         </button>
         <button
           onClick={() => setActiveTab('tasks')}
-          className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+          className={`pb-2.5 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'tasks'
-              ? 'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100'
-              : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+              ? 'border-[#00C2CB] text-[#00C2CB] font-bold'
+              : 'border-transparent text-white/60 hover:text-white'
           }`}
         >
           Habits & Tasks ({goal.tasks?.length || 0})
         </button>
         <button
           onClick={() => setActiveTab('notes')}
-          className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+          className={`pb-2.5 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'notes'
-              ? 'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100'
-              : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+              ? 'border-[#00C2CB] text-[#00C2CB] font-bold'
+              : 'border-transparent text-white/60 hover:text-white'
           }`}
         >
-          Goal Journal & Notes ({goal.notes?.length || 0})
+          Journal Entries ({goal.notes?.length || 0})
         </button>
       </div>
 
-      {/* Tab Content */}
+      {/* Tab: Overview */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Recurring Habits */}
-          <div className="rounded-xl border border-zinc-200/90 bg-white p-5 dark:border-zinc-800/80 dark:bg-zinc-900/50">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Repeat className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Daily Recurring Habits
-                </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Daily Habits */}
+          <div className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-white">
+                <Repeat className="h-4 w-4 text-[#00C2CB]" />
+                <span>Daily Recurring Habits</span>
               </div>
               <button
                 onClick={() => {
@@ -245,7 +227,7 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
                   setIsAddingTask(true);
                   setActiveTab('tasks');
                 }}
-                className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                className="text-xs text-[#00C2CB] hover:underline flex items-center gap-1 font-semibold"
               >
                 <Plus className="h-3 w-3" />
                 Add Habit
@@ -253,18 +235,18 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
             </div>
 
             {recurringTasks.length === 0 ? (
-              <p className="text-xs text-zinc-400">No daily recurring habits yet.</p>
+              <p className="text-xs text-white/40 py-2">No daily habits configured yet.</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {recurringTasks.map((t) => (
                   <div
                     key={t.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 text-xs text-zinc-800 dark:text-zinc-200"
+                    className="flex items-center justify-between p-2 rounded-lg bg-[#161616] text-xs border border-[#2E2E2E]"
                   >
-                    <span className="font-medium">{t.title}</span>
+                    <span className="font-medium text-white">{t.title}</span>
                     <button
                       onClick={() => onDeleteTask(t.id)}
-                      className="text-zinc-400 hover:text-rose-500"
+                      className="text-white/30 hover:text-rose-400"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
@@ -275,20 +257,18 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
           </div>
 
           {/* Phase Plans */}
-          <div className="rounded-xl border border-zinc-200/90 bg-white p-5 dark:border-zinc-800/80 dark:bg-zinc-900/50">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Layers className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Time-boxed Phases
-                </h3>
+          <div className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-white">
+                <Layers className="h-4 w-4 text-[#FF4FA3]" />
+                <span>Structured Phase Plans</span>
               </div>
               <button
                 onClick={() => {
                   setIsAddingPlan(true);
                   setActiveTab('plans');
                 }}
-                className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                className="text-xs text-[#FF4FA3] hover:underline flex items-center gap-1 font-semibold"
               >
                 <Plus className="h-3 w-3" />
                 Add Phase
@@ -296,25 +276,25 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
             </div>
 
             {!goal.plans || goal.plans.length === 0 ? (
-              <p className="text-xs text-zinc-400">
-                No phase plans added. (Optional: use when a goal is large enough to need time-boxed structure).
+              <p className="text-xs text-white/40 py-2">
+                No phase plans added. (Optional: useful when a goal needs time-boxed sub-stages).
               </p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {goal.plans.map((p) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 text-xs"
+                    className="flex items-center justify-between p-2 rounded-lg bg-[#161616] text-xs border border-[#2E2E2E]"
                   >
                     <div>
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100">{p.name}</span>
-                      <div className="text-[10px] text-zinc-400 mt-0.5">
+                      <span className="font-medium text-white">{p.name}</span>
+                      <div className="text-[10px] text-white/40">
                         {format(parseISO(p.startDate), 'MMM d')} → {format(parseISO(p.endDate), 'MMM d, yyyy')}
                       </div>
                     </div>
                     <button
                       onClick={() => onDeletePlan(p.id)}
-                      className="text-zinc-400 hover:text-rose-500"
+                      className="text-white/30 hover:text-rose-400"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
@@ -326,43 +306,42 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
         </div>
       )}
 
-      {/* Plans Tab */}
+      {/* Tab: Plans */}
       {activeTab === 'plans' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Phase Plans within Goal
-            </h3>
+            <h3 className="text-sm font-bold text-white">Phase Plans</h3>
             <button
               onClick={() => setIsAddingPlan(!isAddingPlan)}
-              className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+              className="flex items-center gap-1 rounded-lg bg-[#FF4FA3] px-3 py-1.5 text-xs font-bold text-[#1B1B1B]"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>{isAddingPlan ? 'Cancel' : 'New Phase Plan'}</span>
+              <span>{isAddingPlan ? 'Cancel' : 'New Phase'}</span>
             </button>
           </div>
 
           {isAddingPlan && (
             <form
               onSubmit={handleCreatePlan}
-              className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60 space-y-3"
+              className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 space-y-3"
             >
               <div>
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  Phase Name (e.g. Phase 1: Base Building)
+                <label className="block text-xs font-medium text-white/80 mb-1">
+                  Phase Name
                 </label>
                 <input
                   type="text"
                   required
                   value={planName}
                   onChange={(e) => setPlanName(e.target.value)}
-                  placeholder="Phase name"
-                  className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                  placeholder="e.g. Phase 1: Base Building"
+                  className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white focus:border-[#00C2CB] focus:outline-none"
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-medium text-white/80 mb-1">
                     Start Date
                   </label>
                   <input
@@ -370,11 +349,11 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
                     required
                     value={planStart}
                     onChange={(e) => setPlanStart(e.target.value)}
-                    className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-medium text-white/80 mb-1">
                     End Date
                   </label>
                   <input
@@ -382,21 +361,22 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
                     required
                     value={planEnd}
                     onChange={(e) => setPlanEnd(e.target.value)}
-                    className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white"
                   />
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-1">
+
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsAddingPlan(false)}
-                  className="px-3 py-1 text-xs text-zinc-600 dark:text-zinc-400"
+                  className="px-3 py-1 text-xs text-white/60 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-md bg-zinc-900 px-3 py-1 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  className="rounded-lg bg-[#FF4FA3] px-3.5 py-1.5 text-xs font-bold text-[#1B1B1B]"
                 >
                   Save Phase
                 </button>
@@ -407,40 +387,34 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
           {goal.plans?.map((plan) => (
             <div
               key={plan.id}
-              className="rounded-xl border border-zinc-200/80 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900/40"
+              className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 flex items-center justify-between"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    {plan.name}
-                  </h4>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                    {format(parseISO(plan.startDate), 'MMM d, yyyy')} →{' '}
-                    {format(parseISO(plan.endDate), 'MMM d, yyyy')}
-                  </p>
-                </div>
-                <button
-                  onClick={() => onDeletePlan(plan.id)}
-                  className="text-zinc-400 hover:text-rose-500"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+              <div>
+                <h4 className="text-sm font-bold text-white">{plan.name}</h4>
+                <p className="text-xs text-white/40 mt-0.5">
+                  {format(parseISO(plan.startDate), 'MMM d, yyyy')} →{' '}
+                  {format(parseISO(plan.endDate), 'MMM d, yyyy')}
+                </p>
               </div>
+              <button
+                onClick={() => onDeletePlan(plan.id)}
+                className="text-white/30 hover:text-rose-400"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Tasks Tab */}
+      {/* Tab: Tasks */}
       {activeTab === 'tasks' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Goal Tasks & Habits
-            </h3>
+            <h3 className="text-sm font-bold text-white">Tasks & Habits</h3>
             <button
               onClick={() => setIsAddingTask(!isAddingTask)}
-              className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+              className="flex items-center gap-1 rounded-lg bg-[#FF4FA3] px-3 py-1.5 text-xs font-bold text-[#1B1B1B]"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>{isAddingTask ? 'Cancel' : 'New Task / Habit'}</span>
@@ -450,43 +424,43 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
           {isAddingTask && (
             <form
               onSubmit={handleCreateTask}
-              className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60 space-y-3"
+              className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 space-y-3"
             >
               <div>
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  Task Title
+                <label className="block text-xs font-medium text-white/80 mb-1">
+                  Title
                 </label>
                 <input
                   type="text"
                   required
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
-                  placeholder="e.g. Read 20 pages or Run 5k"
-                  className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                  placeholder="e.g. Read 20 pages or Complete Chapter 1"
+                  className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white focus:border-[#00C2CB] focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-medium text-white/80 mb-1">
                     Type
                   </label>
-                  <div className="flex items-center gap-4 pt-1">
-                    <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                  <div className="flex items-center gap-3 pt-1 text-xs">
+                    <label className="flex items-center gap-1.5 cursor-pointer">
                       <input
                         type="radio"
-                        name="taskType"
                         checked={taskIsRecurring}
                         onChange={() => setTaskIsRecurring(true)}
+                        className="accent-[#00C2CB]"
                       />
-                      <span>Daily Habit (Recurring)</span>
+                      <span>Daily Habit</span>
                     </label>
-                    <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                    <label className="flex items-center gap-1.5 cursor-pointer">
                       <input
                         type="radio"
-                        name="taskType"
                         checked={!taskIsRecurring}
                         onChange={() => setTaskIsRecurring(false)}
+                        className="accent-[#FF4FA3]"
                       />
                       <span>One-Off Task</span>
                     </label>
@@ -495,14 +469,14 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
 
                 {!taskIsRecurring && (
                   <div>
-                    <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                    <label className="block text-xs font-medium text-white/80 mb-1">
                       Target Date
                     </label>
                     <input
                       type="date"
                       value={taskTargetDate}
                       onChange={(e) => setTaskTargetDate(e.target.value)}
-                      className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                      className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white"
                     />
                   </div>
                 )}
@@ -510,15 +484,15 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
 
               {goal.plans && goal.plans.length > 0 && (
                 <div>
-                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                    Associate with Phase Plan (Optional)
+                  <label className="block text-xs font-medium text-white/80 mb-1">
+                    Phase Plan (Optional)
                   </label>
                   <select
                     value={taskPlanId}
                     onChange={(e) => setTaskPlanId(e.target.value)}
-                    className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white"
                   >
-                    <option value="">None (Belongs directly to Goal)</option>
+                    <option value="">Directly under Goal</option>
                     {goal.plans.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}
@@ -528,17 +502,17 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-1">
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsAddingTask(false)}
-                  className="px-3 py-1 text-xs text-zinc-600 dark:text-zinc-400"
+                  className="px-3 py-1 text-xs text-white/60 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-md bg-zinc-900 px-3 py-1 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  className="rounded-lg bg-[#FF4FA3] px-3.5 py-1.5 text-xs font-bold text-[#1B1B1B]"
                 >
                   Save Task
                 </button>
@@ -546,35 +520,31 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
             </form>
           )}
 
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {goal.tasks?.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center justify-between p-3 rounded-xl border border-zinc-200/80 bg-white dark:border-zinc-800/80 dark:bg-zinc-900/40"
+                className="flex items-center justify-between p-3 rounded-xl border border-[#2E2E2E] bg-[#1F1F1F]"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                      {task.title}
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-semibold text-white">{task.title}</span>
+                  {task.isRecurring ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-[#161616] text-[#00C2CB] px-2 py-0.5 rounded border border-[#2E2E2E]">
+                      <Repeat className="h-3 w-3" />
+                      Daily habit
                     </span>
-                    {task.isRecurring ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-zinc-600 dark:text-zinc-400">
-                        <Repeat className="h-3 w-3" />
-                        Daily habit
-                      </span>
-                    ) : (
-                      <span className="text-xs text-zinc-400">
-                        Target: {task.targetDate ? format(parseISO(task.targetDate), 'MMM d, yyyy') : 'Any'}
-                      </span>
-                    )}
-                  </div>
+                  ) : (
+                    <span className="text-[10px] text-white/40">
+                      Target: {task.targetDate ? format(parseISO(task.targetDate), 'MMM d, yyyy') : 'Any'}
+                    </span>
+                  )}
                 </div>
 
                 <button
                   onClick={() => onDeleteTask(task.id)}
-                  className="text-zinc-400 hover:text-rose-500"
+                  className="text-white/30 hover:text-rose-400"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             ))}
@@ -582,29 +552,27 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
         </div>
       )}
 
-      {/* Notes Tab */}
+      {/* Tab: Notes */}
       {activeTab === 'notes' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Journal Entries for {goal.name}
-            </h3>
+            <h3 className="text-sm font-bold text-white">Journal Notes for {goal.name}</h3>
             <button
               onClick={() => setIsAddingNote(!isAddingNote)}
-              className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+              className="flex items-center gap-1 rounded-lg bg-[#FF4FA3] px-3 py-1.5 text-xs font-bold text-[#1B1B1B]"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>{isAddingNote ? 'Cancel' : 'New Journal Entry'}</span>
+              <span>{isAddingNote ? 'Cancel' : 'New Note'}</span>
             </button>
           </div>
 
           {isAddingNote && (
             <form
               onSubmit={handleCreateNote}
-              className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60 space-y-3"
+              className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 space-y-3"
             >
               <div>
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-white/80 mb-1">
                   Title (Optional)
                 </label>
                 <input
@@ -612,12 +580,12 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
                   value={noteTitle}
                   onChange={(e) => setNoteTitle(e.target.value)}
                   placeholder="Reflection title..."
-                  className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                  className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-white/80 mb-1">
                   Content
                 </label>
                 <textarea
@@ -625,55 +593,51 @@ export const GoalDetailView: React.FC<GoalDetailViewProps> = ({
                   rows={4}
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
-                  placeholder="Reflect on your progress, breakthroughs, or adjustments..."
-                  className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                  placeholder="Reflect on progress, obstacles, adjustments..."
+                  className="w-full rounded-lg border border-[#2E2E2E] bg-[#161616] px-3 py-2 text-xs text-white"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-1">
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsAddingNote(false)}
-                  className="px-3 py-1 text-xs text-zinc-600 dark:text-zinc-400"
+                  className="px-3 py-1 text-xs text-white/60 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-md bg-zinc-900 px-3 py-1 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  className="rounded-lg bg-[#FF4FA3] px-3.5 py-1.5 text-xs font-bold text-[#1B1B1B]"
                 >
-                  Save Entry
+                  Save Note
                 </button>
               </div>
             </form>
           )}
 
-          {goal.notes?.map((note) => (
-            <div
-              key={note.id}
-              className="rounded-xl border border-zinc-200/80 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900/40 space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-zinc-400">
-                  {format(parseISO(note.createdAt), 'MMM d, yyyy · h:mm a')}
-                </span>
-                <button
-                  onClick={() => onDeleteNote(note.id)}
-                  className="text-zinc-400 hover:text-rose-500"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+          <div className="space-y-2">
+            {goal.notes?.map((note) => (
+              <div
+                key={note.id}
+                className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 space-y-2"
+              >
+                <div className="flex items-center justify-between text-xs text-white/40">
+                  <span>{format(parseISO(note.createdAt), 'MMM d, yyyy · h:mm a')}</span>
+                  <button
+                    onClick={() => onDeleteNote(note.id)}
+                    className="text-white/30 hover:text-rose-400"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                {note.title && <h4 className="text-sm font-bold text-white">{note.title}</h4>}
+                <p className="text-xs text-white/80 whitespace-pre-wrap leading-relaxed">
+                  {note.content}
+                </p>
               </div>
-              {note.title && (
-                <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  {note.title}
-                </h4>
-              )}
-              <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                {note.content}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

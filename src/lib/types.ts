@@ -58,6 +58,7 @@ export interface TaskInstanceData {
   done: boolean;
   createdAt: string;
   updatedAt: string;
+  task?: TaskData;
   timeBlocks?: TimeBlockData[];
 }
 

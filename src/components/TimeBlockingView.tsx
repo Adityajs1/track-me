@@ -42,7 +42,6 @@ export const TimeBlockingView: React.FC<TimeBlockingViewProps> = ({
     const task = tasks.find((t) => t.id === selectedTaskId);
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
 
-    await侵
     await onCreateTimeBlock({
       taskId: task?.isRecurring ? undefined : task?.id,
       taskInstanceId: task?.isRecurring ? ((task as any).instanceId || undefined) : undefined,

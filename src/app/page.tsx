@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import { GoalData, TaskData, TimeBlockData, NoteData } from '@/lib/types';
 import { Navbar } from '@/components/Navbar';
 import { GoalCard } from '@/components/GoalCard';
@@ -13,15 +13,15 @@ import { InAppReminderBanner } from '@/components/InAppReminderBanner';
 import { CreateGoalModal } from '@/components/Modal';
 import { LandingHero } from '@/components/LandingHero';
 import { format } from 'date-fns';
-import { Plus, Target, Flame, Sparkles, Filter } from 'lucide-react';
+import { Plus, Target, Flame, Sparkles, Filter, ArrowRight } from 'lucide-react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
+  const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState<'goals' | 'checkin' | 'timeblock' | 'notes'>('goals');
   const [selectedGoal, setSelectedGoal] = useState<GoalData | null>(null);
   const [isNewGoalModalOpen, setIsNewGoalModalOpen] = useState(false);
-  const [showLandingIntro, setShowLandingIntro] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showReminders, setShowReminders] = useState(true);
@@ -88,7 +88,6 @@ export default function Home() {
   };
 
   const handleToggleTask = async (taskId: string, done: boolean) => {
-    // Optimistic UI updates
     const res = await fetch(`/api/tasks/${taskId}/toggle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -98,7 +97,6 @@ export default function Home() {
       mutateTasks();
       mutateGoals();
       if (selectedGoal) {
-        // Refresh selected goal detail
         const updatedGoalRes = await fetch(`/api/goals/${selectedGoal.id}`);
         if (updatedGoalRes.ok) {
           setSelectedGoal(await updatedGoalRes.json());
@@ -185,15 +183,26 @@ export default function Home() {
     }
   };
 
-  const handleCreateNote = async (note: {
-    goalId: string | null;
-    title: string;
-    content: string;
-  }) => {
+  const handleCreateNote = async (
+    noteOrGoalId: { goalId: string | null; title: string; content: string } | string | null,
+    maybeTitle?: string,
+    maybeContent?: string
+  ) => {
+    let payload;
+    if (typeof noteOrGoalId === 'object' && noteOrGoalId !== null) {
+      payload = noteOrGoalId;
+    } else {
+      payload = {
+        goalId: noteOrGoalId || null,
+        title: maybeTitle || '',
+        content: maybeContent || '',
+      };
+    }
+
     const res = await fetch('/api/notes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(note),
+      body: JSON.stringify(payload),
     });
     if (res.ok) {
       mutateNotes();
@@ -224,8 +233,13 @@ export default function Home() {
     }
   };
 
+  // If landing page is active
+  if (showLanding) {
+    return <LandingHero onGetStarted={() => setShowLanding(false)} />;
+  }
+
   return (
-    <div className="min-h-screen bg-zinc-50/50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#1B1B1B] text-white flex flex-col font-sans selection:bg-[#FF4FA3] selection:text-white">
       <Navbar
         activeTab={activeTab}
         setActiveTab={(tab) => {
@@ -233,6 +247,7 @@ export default function Home() {
           setActiveTab(tab);
         }}
         onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
+        onOpenLanding={() => setShowLanding(true)}
         totalPoints={totalPoints}
         activeStreak={activeStreak}
         unreadRemindersCount={timeBlocks.length}
@@ -249,9 +264,7 @@ export default function Home() {
       )}
 
       <main className="flex-1 mx-auto w-full max-w-6xl px-4 sm:px-6 py-8">
-        {showLandingIntro ? (
-          <LandingHero onGetStarted={() => setShowLandingIntro(false)} />
-        ) : selectedGoal ? (
+        {selectedGoal ? (
           <GoalDetailView
             goal={selectedGoal}
             onBack={() => setSelectedGoal(null)}
@@ -270,29 +283,34 @@ export default function Home() {
             {/* Tab: Goals & Habits Overview */}
             {activeTab === 'goals' && (
               <div className="space-y-6">
-                {/* Header with search/filter */}
+                {/* Header with quick back to landing & new goal */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-                      Active Goals & Habits
-                    </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-2xl font-bold tracking-tight text-white">
+                        Active Goals & Habits
+                      </h1>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#232323] text-[#00C2CB] border border-[#2E2E2E]">
+                        {goals.length} active
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/60 mt-1">
                       Tracking consistency per goal over time rather than daily pass or fail.
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <button
-                      onClick={() => setShowLandingIntro(true)}
-                      className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 px-2 py-1"
+                      onClick={() => setShowLanding(true)}
+                      className="text-xs text-white/60 hover:text-white px-3 py-1.5 rounded-lg border border-[#2E2E2E] bg-[#232323] transition-colors"
                     >
-                      Product Overview
+                      ← Landing View
                     </button>
                     <button
                       onClick={() => setIsNewGoalModalOpen(true)}
-                      className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white shadow-xs hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+                      className="flex items-center gap-1.5 rounded-xl bg-[#FF4FA3] px-4 py-2 text-xs font-bold text-[#1B1B1B] shadow-sm hover:bg-white hover:text-[#1B1B1B] transition-all cursor-pointer"
                     >
-                      <Plus className="h-3.5 w-3.5" />
+                      <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
                       <span>New Goal</span>
                     </button>
                   </div>
@@ -301,15 +319,15 @@ export default function Home() {
                 {/* Category Filters */}
                 {categories.length > 0 && (
                   <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                    <span className="text-xs text-zinc-400 mr-1 flex items-center gap-1">
-                      <Filter className="h-3 w-3" /> Category:
+                    <span className="text-xs text-white/40 mr-1 flex items-center gap-1">
+                      <Filter className="h-3 w-3" /> Filter:
                     </span>
                     <button
                       onClick={() => setSelectedCategory('all')}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                      className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                         selectedCategory === 'all'
-                          ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                          : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400'
+                          ? 'bg-[#00C2CB] text-[#1B1B1B] font-bold'
+                          : 'bg-[#232323] text-white/70 hover:bg-[#2E2E2E] hover:text-white border border-[#2E2E2E]'
                       }`}
                     >
                       All ({goals.length})
@@ -318,10 +336,10 @@ export default function Home() {
                       <button
                         key={cat}
                         onClick={() => setSelectedCategory(cat)}
-                        className={`rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
+                        className={`rounded-lg px-3 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
                           selectedCategory === cat
-                            ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                            : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400'
+                            ? 'bg-[#00C2CB] text-[#1B1B1B] font-bold'
+                            : 'bg-[#232323] text-white/70 hover:bg-[#2E2E2E] hover:text-white border border-[#2E2E2E]'
                         }`}
                       >
                         {cat} ({goals.filter((g) => g.category === cat).length})
@@ -332,19 +350,19 @@ export default function Home() {
 
                 {/* Goals Grid */}
                 {filteredGoals.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 p-12 text-center">
-                    <Target className="mx-auto h-12 w-12 text-zinc-300 dark:text-zinc-700 mb-4" />
-                    <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                  <div className="rounded-2xl border border-dashed border-[#2E2E2E] bg-[#232323]/40 p-12 text-center">
+                    <Target className="mx-auto h-12 w-12 text-white/20 mb-4" />
+                    <h3 className="text-base font-semibold text-white">
                       No goals created yet
                     </h3>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm mx-auto">
+                    <p className="text-xs text-white/50 mt-1 max-w-sm mx-auto">
                       Create your first goal to begin tracking habits, structured phases, and consistency heatmaps.
                     </p>
                     <button
                       onClick={() => setIsNewGoalModalOpen(true)}
-                      className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-medium text-white shadow-xs dark:bg-zinc-100 dark:text-zinc-900"
+                      className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-[#FF4FA3] px-4 py-2 text-xs font-bold text-[#1B1B1B]"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 stroke-[2.5]" />
                       <span>Add First Goal</span>
                     </button>
                   </div>
@@ -405,11 +423,11 @@ export default function Home() {
         onCreateGoal={handleCreateGoal}
       />
 
-      {/* Calm Footer */}
-      <footer className="mt-auto border-t border-zinc-200/80 dark:border-zinc-800 py-6 text-center text-xs text-zinc-400">
+      {/* Footer */}
+      <footer className="mt-auto border-t border-[#2E2E2E] bg-[#1B1B1B] py-6 text-center text-xs text-white/40">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>TrackMe — Personal Goal & Habit Consistency System</span>
-          <span>Effort as a trend</span>
+          <span>ziffy. — Organise your way</span>
+          <span className="text-[#00C2CB]">Effort as a trend</span>
         </div>
       </footer>
     </div>

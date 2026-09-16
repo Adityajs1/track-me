@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Target, Sparkles } from 'lucide-react';
+import { X, Target } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface CreateGoalModalProps {
@@ -50,14 +50,14 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 text-white">
-      <div className="w-full max-w-md rounded-2xl border border-[#2E2E2E] bg-[#1B1B1B] p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-center justify-between pb-4 border-b border-[#2E2E2E]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 text-white">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0E0E0E] p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#232323] border border-[#2E2E2E] text-[#00C2CB]">
-              <Target className="h-4 w-4" />
+            <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-white">
+              <Target className="h-4 w-4 stroke-[1.5]" />
             </div>
-            <h3 className="text-base font-bold text-white">
+            <h3 className="text-base font-semibold text-white">
               Create New Goal
             </h3>
           </div>
@@ -69,9 +69,9 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-white/80 mb-1">
+            <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-1.5">
               Goal Name
             </label>
             <input
@@ -79,13 +79,13 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Run a 10K Marathon or Master System Design"
-              className="w-full rounded-xl border border-[#2E2E2E] bg-[#232323] px-3.5 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-[#FF4FA3] focus:outline-none"
+              placeholder="e.g. Marathon Training or Learn Rust"
+              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-white/40 focus:outline-none transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-white/80 mb-1">
+            <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-1.5">
               Category (user-defined)
             </label>
             <input
@@ -93,17 +93,17 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
               required
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. Fitness, Learning, Career, Mindset..."
-              className="w-full rounded-xl border border-[#2E2E2E] bg-[#232323] px-3.5 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-[#00C2CB] focus:outline-none"
+              placeholder="e.g. Health, Career, Craft, Learning..."
+              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-white/40 focus:outline-none transition-colors"
             />
-            <p className="text-[11px] text-white/40 mt-1">
-              No hardcoded lists — you define the areas of your life.
+            <p className="text-[11px] text-white/40 mt-1 font-mono">
+              Zero hardcoded categories — define what matters to you.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-white/80 mb-1">
+              <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-1.5">
                 Start Date
               </label>
               <input
@@ -111,13 +111,13 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
                 required
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-xl border border-[#2E2E2E] bg-[#232323] px-3 py-2 text-sm text-white focus:border-[#00C2CB] focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white focus:border-white/40 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/80 mb-1">
-                Target End Date (Optional)
+              <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-1.5">
+                End Date (Optional)
               </label>
               <div className="space-y-1.5">
                 <input
@@ -125,26 +125,26 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
                   disabled={!hasEndDate}
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className={`w-full rounded-xl border px-3 py-2 text-sm text-white focus:outline-none ${
+                  className={`w-full rounded-xl border px-3 py-2 text-xs text-white focus:outline-none ${
                     hasEndDate
-                      ? 'border-[#2E2E2E] bg-[#232323] focus:border-[#FF4FA3]'
-                      : 'border-[#2E2E2E]/50 bg-[#1B1B1B] text-white/20 cursor-not-allowed'
+                      ? 'border-white/10 bg-white/[0.03] focus:border-white/40'
+                      : 'border-white/5 bg-transparent text-white/10 cursor-not-allowed'
                   }`}
                 />
-                <label className="flex items-center gap-1.5 text-[11px] text-white/60 cursor-pointer">
+                <label className="flex items-center gap-1.5 text-[11px] text-white/50 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={hasEndDate}
                     onChange={(e) => setHasEndDate(e.target.checked)}
-                    className="accent-[#FF4FA3]"
+                    className="accent-white"
                   />
-                  <span>Has target end date</span>
+                  <span>Time-boxed goal</span>
                 </label>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2.5 pt-4 border-t border-[#2E2E2E]">
+          <div className="flex justify-end gap-2.5 pt-4 border-t border-white/10">
             <button
               type="button"
               onClick={onClose}
@@ -155,7 +155,7 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-[#FF4FA3] px-5 py-2.5 text-xs font-bold text-[#1B1B1B] shadow-md hover:bg-white transition-all"
+              className="rounded-xl bg-white px-5 py-2.5 text-xs font-semibold text-black shadow-sm hover:bg-white/90 transition-all cursor-pointer"
             >
               {isSubmitting ? 'Creating...' : 'Create Goal'}
             </button>

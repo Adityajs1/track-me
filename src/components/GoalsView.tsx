@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   ChevronRight,
   Filter,
-  Trash2,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -39,35 +38,30 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
       : goals.filter((g) => g.category === selectedCategory);
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      {/* Page Header (Notion Style) */}
-      <div className="pb-4 border-b border-[#2E2E2E]">
-        <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
-          <span>Ziffy</span>
+    <div className="space-y-8 max-w-5xl mx-auto text-white">
+      {/* Page Header */}
+      <div className="pb-6 border-b border-white/10">
+        <div className="flex items-center gap-2 text-xs text-white/40 mb-2 font-mono">
+          <span>ziffy</span>
           <span>/</span>
           <span className="text-white">Goals & Habits</span>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#232323] border border-[#2E2E2E] text-[#00C2CB]">
-              <Target className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white">
-                Goals & Habits
-              </h1>
-              <p className="text-xs text-white/50 mt-0.5">
-                Track consistency per goal over time rather than daily pass/fail.
-              </p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
+              Goals & Habits
+            </h1>
+            <p className="text-sm text-white/50 mt-1">
+              Organise structured phases, daily habits, and effort trends.
+            </p>
           </div>
 
           <button
             onClick={onOpenNewGoal}
-            className="flex items-center gap-1.5 rounded-xl bg-[#FF4FA3] px-3.5 py-2 text-xs font-bold text-[#1B1B1B] shadow-sm hover:bg-white hover:text-[#1B1B1B] transition-all cursor-pointer"
+            className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-white/90 transition-all cursor-pointer shadow-xs self-start sm:self-auto"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5 stroke-[2]" />
             <span>New Goal</span>
           </button>
         </div>
@@ -75,16 +69,16 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
 
       {/* Database Toolbar (Filter by Category & View switch) */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-          <span className="text-white/40 flex items-center gap-1 mr-1">
-            <Filter className="h-3.5 w-3.5" /> Filter:
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <span className="text-white/40 flex items-center gap-1 mr-1 text-[11px] font-mono uppercase tracking-wider">
+            <Filter className="h-3.5 w-3.5 stroke-[1.5]" /> Filter:
           </span>
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-lg px-3 py-1 font-medium transition-all ${
               selectedCategory === 'all'
-                ? 'bg-[#00C2CB] text-[#1B1B1B] font-bold'
-                : 'bg-[#232323] text-white/70 hover:bg-[#2E2E2E] hover:text-white border border-[#2E2E2E]'
+                ? 'bg-white text-black font-semibold shadow-xs'
+                : 'bg-white/[0.04] text-white/60 hover:bg-white/10 hover:text-white border border-white/10'
             }`}
           >
             All ({goals.length})
@@ -94,10 +88,10 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`rounded-lg px-3 py-1 font-medium whitespace-nowrap transition-all ${
                 selectedCategory === cat
-                  ? 'bg-[#00C2CB] text-[#1B1B1B] font-bold'
-                  : 'bg-[#232323] text-white/70 hover:bg-[#2E2E2E] hover:text-white border border-[#2E2E2E]'
+                  ? 'bg-white text-black font-semibold shadow-xs'
+                  : 'bg-white/[0.04] text-white/60 hover:bg-white/10 hover:text-white border border-white/10'
               }`}
             >
               {cat} ({goals.filter((g) => g.category === cat).length})
@@ -105,19 +99,19 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
           ))}
         </div>
 
-        <div className="flex items-center rounded-lg border border-[#2E2E2E] bg-[#1F1F1F] p-0.5">
+        <div className="flex items-center rounded-lg border border-white/10 bg-white/[0.03] p-0.5">
           <button
             onClick={() => setViewMode('cards')}
-            className={`px-2.5 py-1 rounded text-xs font-medium ${
-              viewMode === 'cards' ? 'bg-[#2E2E2E] text-white font-semibold' : 'text-white/60'
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+              viewMode === 'cards' ? 'bg-white text-black font-semibold shadow-xs' : 'text-white/50'
             }`}
           >
             Cards
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`px-2.5 py-1 rounded text-xs font-medium ${
-              viewMode === 'table' ? 'bg-[#2E2E2E] text-white font-semibold' : 'text-white/60'
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+              viewMode === 'table' ? 'bg-white text-black font-semibold shadow-xs' : 'text-white/50'
             }`}
           >
             Table
@@ -127,24 +121,24 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
 
       {/* Content Rendering */}
       {filteredGoals.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#2E2E2E] bg-[#1F1F1F]/40 p-12 text-center">
-          <Target className="mx-auto h-10 w-10 text-white/20 mb-3" />
-          <h3 className="text-sm font-semibold text-white">
-            No goals found
+        <div className="glass-panel rounded-2xl p-16 text-center">
+          <Target className="mx-auto h-12 w-12 text-white/20 mb-4 stroke-[1.25]" />
+          <h3 className="text-base font-semibold text-white">
+            No goals created yet
           </h3>
-          <p className="text-xs text-white/50 mt-1 max-w-sm mx-auto">
-            Create your first goal with custom category, timeframe, and recurring habits.
+          <p className="text-xs text-white/40 mt-1 max-w-sm mx-auto leading-relaxed">
+            Start completely clean. Create your first goal to track habits, time-boxed phases, and dynamic consistency trends.
           </p>
           <button
             onClick={onOpenNewGoal}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#FF4FA3] px-3.5 py-2 text-xs font-bold text-[#1B1B1B]"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-semibold text-black hover:bg-white/90 transition-all shadow-xs"
           >
-            <Plus className="h-3.5 w-3.5" />
-            <span>Create Goal</span>
+            <Plus className="h-3.5 w-3.5 stroke-[2]" />
+            <span>Create Your First Goal</span>
           </button>
         </div>
       ) : viewMode === 'cards' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredGoals.map((goal) => {
             const metrics = goal.metrics;
             const recentDays = metrics?.daysSummary ? metrics.daysSummary.slice(-35) : [];
@@ -153,23 +147,23 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
               <div
                 key={goal.id}
                 onClick={() => onSelectGoal(goal)}
-                className="group relative flex flex-col justify-between rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] p-4 shadow-sm hover:border-[#00C2CB]/60 transition-all cursor-pointer"
+                className="glass-panel glass-panel-hover group relative flex flex-col justify-between rounded-2xl p-6 cursor-pointer"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="inline-flex items-center rounded-md bg-[#161616] px-2 py-0.5 text-xs font-medium text-[#00C2CB] border border-[#2E2E2E]">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="inline-flex items-center rounded-md bg-white/[0.05] px-2.5 py-1 text-[11px] font-mono text-white/80 border border-white/10">
                       {goal.category}
                     </span>
 
-                    <div className="flex items-center gap-2 text-xs">
+                    <div className="flex items-center gap-2 text-xs font-mono">
                       {metrics && (
                         <>
-                          <div className="flex items-center gap-1 text-[#FF4FA3] font-semibold">
-                            <Flame className="h-3 w-3 fill-[#FF4FA3]" />
+                          <div className="flex items-center gap-1 text-white/90">
+                            <Flame className="h-3.5 w-3.5 stroke-[1.5]" />
                             <span>{metrics.currentStreak}d</span>
                           </div>
-                          <span className="text-[#2E2E2E]">·</span>
-                          <span className="text-white/60 font-medium">
+                          <span className="text-white/20">·</span>
+                          <span className="text-white/50">
                             {metrics.totalPoints} pts
                           </span>
                         </>
@@ -178,37 +172,37 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
                   </div>
 
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="text-base font-bold text-white group-hover:text-[#00C2CB] transition-colors">
+                    <h3 className="text-lg font-semibold text-white group-hover:text-white transition-colors">
                       {goal.name}
                     </h3>
-                    <ChevronRight className="h-4 w-4 text-white/30 group-hover:text-white transition-colors shrink-0 mt-1" />
+                    <ChevronRight className="h-4 w-4 text-white/30 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0 mt-1 stroke-[1.5]" />
                   </div>
 
-                  <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-white/40 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3 text-[#00C2CB]" />
+                  <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-white/40 mb-5">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 stroke-[1.5]" />
                       <span>
                         {format(parseISO(goal.startDate), 'MMM d')}
                         {goal.endDate ? ` → ${format(parseISO(goal.endDate), 'MMM d, yyyy')}` : ' (ongoing)'}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <Layers className="h-3 w-3" />
+                    <div className="flex items-center gap-1.5">
+                      <Layers className="h-3.5 w-3.5 stroke-[1.5]" />
                       <span>{goal.plans?.length || 0} plans</span>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3 text-[#FF4FA3]" />
-                      <span>{goal.tasks?.length || 0} tasks/habits</span>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5 stroke-[1.5]" />
+                      <span>{goal.tasks?.length || 0} habits/tasks</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#2E2E2E]">
-                  <div className="flex items-center justify-between text-[10px] text-white/40 mb-1">
+                <div className="pt-4 border-t border-white/10">
+                  <div className="flex items-center justify-between text-[11px] text-white/40 mb-1.5">
                     <span>Recent 5 weeks</span>
-                    <span className="text-[#00C2CB]">Open details →</span>
+                    <span className="text-white/60 group-hover:text-white transition-colors">View details →</span>
                   </div>
                   <Heatmap daysSummary={recentDays} compact />
                 </div>
@@ -217,47 +211,47 @@ export const GoalsView: React.FC<GoalsViewProps> = ({
           })}
         </div>
       ) : (
-        /* Notion Database Table View */
-        <div className="rounded-xl border border-[#2E2E2E] bg-[#1F1F1F] overflow-hidden text-xs">
+        /* Database Table View */
+        <div className="glass-panel rounded-2xl overflow-hidden text-xs">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#2E2E2E] bg-[#161616] text-white/40 font-semibold">
-                <th className="p-3">Name</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Timeframe</th>
-                <th className="p-3">Plans / Tasks</th>
-                <th className="p-3">Streak & Points</th>
-                <th className="p-3 text-right">Action</th>
+              <tr className="border-b border-white/10 bg-white/[0.02] text-white/40 font-mono text-[11px] uppercase tracking-wider">
+                <th className="p-4">Name</th>
+                <th className="p-4">Category</th>
+                <th className="p-4">Timeframe</th>
+                <th className="p-4">Plans / Tasks</th>
+                <th className="p-4">Streak & Points</th>
+                <th className="p-4 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2E2E2E]">
+            <tbody className="divide-y divide-white/5">
               {filteredGoals.map((goal) => (
                 <tr
                   key={goal.id}
                   onClick={() => onSelectGoal(goal)}
-                  className="hover:bg-[#232323] cursor-pointer transition-colors"
+                  className="hover:bg-white/[0.04] cursor-pointer transition-colors"
                 >
-                  <td className="p-3 font-semibold text-white">
+                  <td className="p-4 font-semibold text-white">
                     {goal.name}
                   </td>
-                  <td className="p-3">
-                    <span className="inline-block px-2 py-0.5 rounded bg-[#161616] text-[#00C2CB] border border-[#2E2E2E]">
+                  <td className="p-4">
+                    <span className="inline-block px-2.5 py-0.5 rounded bg-white/[0.05] text-white/80 border border-white/10 font-mono">
                       {goal.category}
                     </span>
                   </td>
-                  <td className="p-3 text-white/60">
+                  <td className="p-4 text-white/50 font-mono">
                     {format(parseISO(goal.startDate), 'MMM d, yyyy')}
                     {goal.endDate ? ` → ${format(parseISO(goal.endDate), 'MMM d, yyyy')}` : ''}
                   </td>
-                  <td className="p-3 text-white/60">
+                  <td className="p-4 text-white/50">
                     {goal.plans?.length || 0} plans · {goal.tasks?.length || 0} tasks
                   </td>
-                  <td className="p-3">
-                    <span className="text-[#FF4FA3] font-semibold">{goal.metrics?.currentStreak || 0}d</span>
-                    <span className="text-white/40 mx-1">·</span>
-                    <span className="text-white/80">{goal.metrics?.totalPoints || 0} pts</span>
+                  <td className="p-4 font-mono">
+                    <span className="text-white font-semibold">{goal.metrics?.currentStreak || 0}d</span>
+                    <span className="text-white/20 mx-1">·</span>
+                    <span className="text-white/60">{goal.metrics?.totalPoints || 0} pts</span>
                   </td>
-                  <td className="p-3 text-right">
+                  <td className="p-4 text-right">
                     <ChevronRight className="h-4 w-4 inline text-white/40" />
                   </td>
                 </tr>

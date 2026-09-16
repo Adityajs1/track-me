@@ -1,44 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #1B1B1B;
+  --background: #000000;
   --foreground: #FFFFFF;
-  --bubblegum-pink: #FF4FA3;
-  --vibrant-cyan: #00C2CB;
-  --dark-onyx: #1B1B1B;
-  --dark-card: #232323;
-  --dark-border: #2E2E2E;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-pink: #FF4FA3;
-  --color-cyan: #00C2CB;
-  --color-onyx: #1B1B1B;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: #1B1B1B;
+  background-color: #000000;
   color: #FFFFFF;
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Custom Scrollbar */
+/* Glassmorphic utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.glass-panel-hover:hover {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Minimalist Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #1B1B1B;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2E2E2E;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #FF4FA3;
+  background: rgba(255, 255, 255, 0.3);
 }

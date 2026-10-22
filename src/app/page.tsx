@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { ProductivityHeatmap } from '@/components/ProductivityHeatmap';
 import { CreateGoalModal } from '@/components/Modal';
-import { LandingHero } from '@/components/LandingHero';
 import { format } from 'date-fns';
 import {
   LayoutDashboard,
@@ -32,7 +31,6 @@ export default function Home() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [showLanding, setShowLanding] = useState(!user);
   const [isNewGoalModalOpen, setIsNewGoalModalOpen] = useState(false);
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -78,6 +76,10 @@ export default function Home() {
     startDate: string;
     endDate?: string;
   }) => {
+    if (!user) {
+      router.push('/login?redirect=/');
+      return;
+    }
     const res = await fetch('/api/goals', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -89,10 +91,6 @@ export default function Home() {
     }
   };
 
-  if (!user && showLanding) {
-    return <LandingHero onGetStarted={() => setShowLanding(false)} />;
-  }
-
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
       {/* Notion-style Left Sidebar */}
@@ -100,8 +98,13 @@ export default function Home() {
         goals={goals}
         selectedGoalId={null}
         onSelectGoal={(g) => router.push(`/goals-habits?goal=${g.id}`)}
-        onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
-        onOpenLanding={() => setShowLanding(true)}
+        onOpenNewGoal={() => {
+          if (!user) {
+            router.push('/login?redirect=/');
+            return;
+          }
+          setIsNewGoalModalOpen(true);
+        }}
         totalPoints={totalPoints}
         activeStreak={activeStreak}
       />

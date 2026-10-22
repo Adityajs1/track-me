@@ -56,16 +56,16 @@ function LoginForm() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white">
-        <Loader2 className="h-6 w-6 animate-spin text-[#00C2CB]" />
+        <Loader2 className="h-6 w-6 animate-spin text-white" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col justify-center items-center px-4 sm:px-6 py-12 selection:bg-[#FF4FA3] selection:text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col justify-center items-center px-4 sm:px-6 py-12 selection:bg-white selection:text-black">
       {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#00C2CB]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-[#FF4FA3]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-white/[0.02] rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative w-full max-w-md">
         {/* Brand Header */}
@@ -222,7 +222,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white">
-        <Loader2 className="h-6 w-6 animate-spin text-[#00C2CB]" />
+        <Loader2 className="h-6 w-6 animate-spin text-white" />
       </div>
     }>
       <LoginForm />

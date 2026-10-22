@@ -37,7 +37,7 @@ export const InAppReminderBanner: React.FC<InAppReminderBannerProps> = ({
     <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-4">
       <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-zinc-200/90 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60 shadow-xs">
         <div className="flex items-start sm:items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400 shrink-0 mt-0.5 sm:mt-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white shrink-0 mt-0.5 sm:mt-0">
             <Bell className="h-4 w-4" />
           </div>
 

@@ -31,17 +31,17 @@ export const Heatmap: React.FC<HeatmapProps> = ({
 
   const getColorClass = (day: DaySummary) => {
     if (day.plannedCount === 0) {
-      return 'bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/50 dark:border-zinc-800/40';
+      return 'bg-white/[0.04] border border-white/[0.07]';
     }
     switch (day.color) {
       case 'green':
-        return 'bg-emerald-600 dark:bg-emerald-500 border border-emerald-700/50 dark:border-emerald-400/50';
+        return 'bg-white border border-white';
       case 'yellow':
-        return 'bg-amber-400 dark:bg-amber-400 border border-amber-500/50 dark:border-amber-300/50';
+        return 'bg-neutral-400 border border-neutral-300';
       case 'red':
-        return 'bg-rose-400 dark:bg-rose-500 border border-rose-500/50 dark:border-rose-400/50';
+        return 'bg-neutral-700 border border-neutral-600';
       default:
-        return 'bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/50 dark:border-zinc-800/40';
+        return 'bg-white/[0.04] border border-white/[0.07]';
     }
   };
 
@@ -83,23 +83,23 @@ export const Heatmap: React.FC<HeatmapProps> = ({
 
       {/* Legend */}
       {!compact && (
-        <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 pt-1">
+        <div className="flex items-center justify-between text-[11px] text-white/40 pt-1">
           <span>Consistency trend</span>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700" />
+              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-white/[0.04] border border-white/10" />
               Rest / 0 planned
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-rose-400 dark:bg-rose-500" />
+              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-neutral-700" />
               &lt;30%
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-amber-400" />
+              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-neutral-400" />
               30-80%
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-emerald-600 dark:bg-emerald-500" />
+              <span className="inline-block w-2.5 h-2.5 rounded-[2px] bg-white" />
               ≥80%
             </span>
           </div>

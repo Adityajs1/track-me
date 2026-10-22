@@ -33,15 +33,15 @@ export const ProductivityHeatmap: React.FC<ProductivityHeatmapProps> = ({
   const getCellClasses = (day: ProductivityDayData) => {
     switch (day.intensity) {
       case 1:
-        return 'bg-emerald-950/90 border border-emerald-800/50 hover:border-emerald-600';
+        return 'bg-neutral-800 border border-neutral-700 hover:border-neutral-500';
       case 2:
-        return 'bg-emerald-700/80 border border-emerald-600/60 hover:border-emerald-400';
+        return 'bg-neutral-600 border border-neutral-500 hover:border-neutral-300';
       case 3:
-        return 'bg-emerald-500 border border-emerald-400/80 hover:border-emerald-300';
+        return 'bg-neutral-400 border border-neutral-300 hover:border-white';
       case 4:
-        return 'bg-emerald-400 border border-emerald-200 hover:brightness-125';
+        return 'bg-white border border-white hover:brightness-125 shadow-xs';
       default:
-        return 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.08]';
+        return 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.1]';
     }
   };
 
@@ -53,7 +53,7 @@ export const ProductivityHeatmap: React.FC<ProductivityHeatmapProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2 text-xs font-mono text-white/50 uppercase tracking-wider mb-1">
-            <Award className="h-3.5 w-3.5 text-[#00C2CB]" />
+            <Award className="h-3.5 w-3.5 text-white" />
             <span>Productivity Activity</span>
           </div>
           <h2 className="text-xl font-bold tracking-tight text-white">
@@ -66,14 +66,14 @@ export const ProductivityHeatmap: React.FC<ProductivityHeatmapProps> = ({
 
         {/* Streaks & Totals badges */}
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#232323] border border-white/10">
-            <Flame className="h-3.5 w-3.5 text-[#FF4FA3]" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161616] border border-white/10">
+            <Flame className="h-3.5 w-3.5 text-white" />
             <span className="font-semibold text-white">{data.currentStreak}d</span>
             <span className="text-white/40">streak</span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#232323] border border-white/10">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[#00C2CB]" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161616] border border-white/10">
+            <CheckCircle2 className="h-3.5 w-3.5 text-white" />
             <span className="font-semibold text-white">{data.totalEvents}</span>
             <span className="text-white/40">total completions</span>
           </div>
@@ -116,7 +116,7 @@ export const ProductivityHeatmap: React.FC<ProductivityHeatmapProps> = ({
             <div className="font-semibold text-white">
               {format(parseISO(hoveredDay.date), 'EEEE, MMMM d, yyyy')}
             </div>
-            <div className="text-[11px] text-[#00C2CB] font-mono mt-0.5 font-bold">
+            <div className="text-[11px] text-white font-mono mt-0.5 font-bold">
               {hoveredDay.totalEvents === 0
                 ? 'No completions recorded'
                 : `${hoveredDay.totalEvents} completion ${hoveredDay.totalEvents === 1 ? 'event' : 'events'}`}
@@ -130,7 +130,7 @@ export const ProductivityHeatmap: React.FC<ProductivityHeatmapProps> = ({
                   <div>• Habits completed: <strong>{hoveredDay.habitsCompletedCount}</strong></div>
                 )}
                 {hoveredDay.hasCheckIn && (
-                  <div className="text-emerald-400">• Daily check-in: Completed ✓</div>
+                  <div className="text-white font-semibold">• Daily check-in: Completed ✓</div>
                 )}
               </div>
             )}
@@ -155,15 +155,15 @@ export const ProductivityHeatmap: React.FC<ProductivityHeatmapProps> = ({
           </span>
         </div>
 
-        {/* GitHub style intensity legend */}
+        {/* GitHub style intensity legend (monochrome) */}
         <div className="flex items-center gap-1.5 font-mono text-[10px]">
           <span>Less</span>
           <div className="flex items-center gap-1">
             <span className="w-3 h-3 rounded-[2px] bg-white/[0.04] border border-white/10" title="0 events" />
-            <span className="w-3 h-3 rounded-[2px] bg-emerald-950/90 border border-emerald-800/50" title="1 event" />
-            <span className="w-3 h-3 rounded-[2px] bg-emerald-700/80 border border-emerald-600/60" title="2 events" />
-            <span className="w-3 h-3 rounded-[2px] bg-emerald-500 border border-emerald-400" title="3-4 events" />
-            <span className="w-3 h-3 rounded-[2px] bg-emerald-400 border border-emerald-200" title="5+ events" />
+            <span className="w-3 h-3 rounded-[2px] bg-neutral-800 border border-neutral-700" title="1 event" />
+            <span className="w-3 h-3 rounded-[2px] bg-neutral-600 border border-neutral-500" title="2 events" />
+            <span className="w-3 h-3 rounded-[2px] bg-neutral-400 border border-neutral-300" title="3-4 events" />
+            <span className="w-3 h-3 rounded-[2px] bg-white border border-white shadow-xs" title="5+ events" />
           </div>
           <span>More</span>
         </div>

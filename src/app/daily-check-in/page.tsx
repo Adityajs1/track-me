@@ -134,7 +134,7 @@ export default function DailyCheckInPage() {
   const moodOptions = ['Great', 'Focused', 'Steady', 'Tired', 'Challenging'];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-[#FF4FA3] selection:text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
       {/* Sidebar with active tab */}
       <Sidebar
         activeTab="checkin"
@@ -155,7 +155,7 @@ export default function DailyCheckInPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                <CheckCircle2 className="h-7 w-7 text-[#00C2CB]" />
+                <CheckCircle2 className="h-7 w-7 text-white" />
                 <span>Daily Check-In</span>
               </h1>
               <p className="text-xs text-white/50 mt-1">
@@ -175,14 +175,14 @@ export default function DailyCheckInPage() {
 
           {/* Feedback messages */}
           {saveSuccess && (
-            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-400 flex items-center gap-2">
+            <div className="p-3.5 rounded-xl bg-white/[0.08] border border-white/20 text-xs text-white flex items-center gap-2">
               <Check className="h-4 w-4" />
               <span>Daily check-in saved and recorded to your productivity heatmap!</span>
             </div>
           )}
 
           {error && (
-            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-400 flex items-center gap-2">
+            <div className="p-3.5 rounded-xl bg-white/[0.08] border border-white/20 text-xs text-white/80 flex items-center gap-2">
               <AlertCircle className="h-4 w-4" />
               <span>{error}</span>
             </div>
@@ -194,7 +194,7 @@ export default function DailyCheckInPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2 flex items-center gap-1.5">
-                  <Zap className="h-3.5 w-3.5 text-amber-400" />
+                  <Zap className="h-3.5 w-3.5 text-white" />
                   <span>Energy Level ({energy}/5)</span>
                 </label>
                 <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export default function DailyCheckInPage() {
                       onClick={() => setEnergy(lvl)}
                       className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         energy === lvl
-                          ? 'bg-amber-400 text-black shadow-sm'
+                          ? 'bg-white text-black shadow-xs'
                           : 'bg-white/[0.04] border border-white/10 text-white/60 hover:text-white hover:bg-white/[0.08]'
                       }`}
                     >
@@ -217,7 +217,7 @@ export default function DailyCheckInPage() {
 
               <div>
                 <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2 flex items-center gap-1.5">
-                  <Smile className="h-3.5 w-3.5 text-[#00C2CB]" />
+                  <Smile className="h-3.5 w-3.5 text-white" />
                   <span>Mindset / Mood</span>
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -228,7 +228,7 @@ export default function DailyCheckInPage() {
                       onClick={() => setMood(m)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                         mood === m
-                          ? 'bg-[#00C2CB] text-black font-semibold'
+                          ? 'bg-white text-black font-semibold shadow-xs'
                           : 'bg-white/[0.04] border border-white/10 text-white/60 hover:text-white'
                       }`}
                     >
@@ -243,7 +243,7 @@ export default function DailyCheckInPage() {
             <div className="pt-2 border-t border-white/10 space-y-3">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-mono uppercase tracking-wider text-white/70 flex items-center gap-1.5">
-                  <Award className="h-3.5 w-3.5 text-[#FF4FA3]" />
+                  <Award className="h-3.5 w-3.5 text-white" />
                   <span>Daily Habits & Tasks ({completedTasks}/{totalTasks})</span>
                 </span>
                 <span className="text-white/40 font-mono">
@@ -265,14 +265,14 @@ export default function DailyCheckInPage() {
                         onClick={() => handleToggleTask(t.id, isDone)}
                         className={`p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
                           isDone
-                            ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
+                            ? 'bg-white/[0.04] border-white/20 text-white/70'
                             : 'bg-white/[0.02] border-white/10 text-white/80 hover:bg-white/[0.04]'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`h-5 w-5 rounded-md flex items-center justify-center ${
-                              isDone ? 'bg-emerald-500 text-black' : 'border border-white/30'
+                              isDone ? 'bg-white text-black' : 'border border-white/30'
                             }`}
                           >
                             {isDone && <Check className="h-3.5 w-3.5 stroke-[3]" />}
@@ -351,7 +351,7 @@ export default function DailyCheckInPage() {
                       <span className="font-semibold text-white">
                         {format(new Date(c.date), 'EEEE, MMM d')}
                       </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-white font-mono">
                         {c.mood || 'Completed'}
                       </span>
                     </div>

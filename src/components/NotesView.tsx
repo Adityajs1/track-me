@@ -58,7 +58,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#232323] border border-[#2E2E2E] text-[#FF4FA3]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#232323] border border-[#2E2E2E] text-white">
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
@@ -73,7 +73,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
 
           <button
             onClick={() => setIsCreating(!isCreating)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#FF4FA3] px-3.5 py-2 text-xs font-bold text-[#1B1B1B] shadow-sm hover:bg-white transition-all cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-xs font-bold text-black shadow-sm hover:bg-white/90 transition-all cursor-pointer"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>New Entry</span>
@@ -87,7 +87,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
           onClick={() => setFilter('all')}
           className={`rounded-lg px-3 py-1 font-medium transition-colors ${
             filter === 'all'
-              ? 'bg-[#00C2CB] text-[#1B1B1B] font-bold'
+              ? 'bg-white text-black font-semibold'
               : 'bg-[#232323] text-white/70 hover:bg-[#2E2E2E] border border-[#2E2E2E]'
           }`}
         >
@@ -98,7 +98,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
           onClick={() => setFilter('general')}
           className={`rounded-lg px-3 py-1 font-medium transition-colors ${
             filter === 'general'
-              ? 'bg-[#00C2CB] text-[#1B1B1B] font-bold'
+              ? 'bg-white text-black font-semibold'
               : 'bg-[#232323] text-white/70 hover:bg-[#2E2E2E] border border-[#2E2E2E]'
           }`}
         >
@@ -113,7 +113,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
               onClick={() => setFilter(g.id)}
               className={`rounded-lg px-3 py-1 font-medium whitespace-nowrap transition-colors ${
                 filter === g.id
-                  ? 'bg-[#00C2CB] text-[#1B1B1B] font-bold'
+                  ? 'bg-white text-black font-semibold'
                   : 'bg-[#232323] text-white/70 hover:bg-[#2E2E2E] border border-[#2E2E2E]'
               }`}
             >
@@ -188,7 +188,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-[#FF4FA3] px-4 py-1.5 text-xs font-bold text-[#1B1B1B]"
+              className="rounded-lg bg-white px-4 py-1.5 text-xs font-bold text-black"
             >
               Save Entry
             </button>
@@ -215,12 +215,12 @@ export const NotesView: React.FC<NotesViewProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {note.goal ? (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-[#161616] px-2 py-0.5 text-xs font-semibold text-[#00C2CB] border border-[#2E2E2E]">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-[#161616] px-2 py-0.5 text-xs font-semibold text-white border border-[#2E2E2E]">
                       <Tag className="h-3 w-3" />
                       {note.goal.name}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-[#161616] px-2 py-0.5 text-xs font-semibold text-[#FF4FA3] border border-[#2E2E2E]">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-[#161616] px-2 py-0.5 text-xs font-semibold text-white border border-[#2E2E2E]">
                       <BookOpen className="h-3 w-3" />
                       General Journal
                     </span>
@@ -232,7 +232,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
 
                 <button
                   onClick={() => onDeleteNote(note.id)}
-                  className="text-white/30 hover:text-rose-400 transition-colors"
+                  className="text-white/30 hover:text-white transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

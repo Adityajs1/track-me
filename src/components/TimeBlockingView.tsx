@@ -286,7 +286,7 @@ export const TimeBlockingView: React.FC<TimeBlockingViewProps> = ({
           </h2>
 
           {isLoading && (
-            <Loader2 className="h-4 w-4 animate-spin text-[#00C2CB] ml-2" />
+            <Loader2 className="h-4 w-4 animate-spin text-white ml-2" />
           )}
         </div>
 
@@ -336,7 +336,7 @@ export const TimeBlockingView: React.FC<TimeBlockingViewProps> = ({
               });
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-1.5 rounded-xl bg-[#FF4FA3] hover:bg-white text-[#0A0A0A] px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-white/90 text-black px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs"
           >
             <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
             <span className="hidden sm:inline">Schedule Block</span>
@@ -475,7 +475,7 @@ const DayView: React.FC<DayViewProps> = ({
           <div
             className={`flex h-10 w-10 items-center justify-center rounded-full text-base font-bold ${
               isViewingToday
-                ? 'bg-[#00C2CB] text-[#0A0A0A]'
+                ? 'bg-white text-black'
                 : 'bg-white/10 text-white'
             }`}
           >
@@ -498,14 +498,14 @@ const DayView: React.FC<DayViewProps> = ({
           className="relative min-w-full"
           style={{ height: `${HOURS_COUNT * PIXELS_PER_HOUR}px` }}
         >
-          {/* Current time red line */}
+          {/* Current time line */}
           {isViewingToday && (
             <div
               className="absolute left-16 right-0 z-20 flex items-center pointer-events-none"
               style={{ top: `${(currentTimeMinutes / 60) * PIXELS_PER_HOUR}px` }}
             >
-              <div className="h-2.5 w-2.5 rounded-full bg-[#FF4FA3] -ml-1.5 shadow-sm" />
-              <div className="flex-1 border-t-2 border-[#FF4FA3]" />
+              <div className="h-2.5 w-2.5 rounded-full bg-white -ml-1.5 shadow-sm" />
+              <div className="flex-1 border-t-2 border-white" />
             </div>
           )}
 
@@ -633,7 +633,7 @@ const WeekView: React.FC<WeekViewProps> = ({
               <div
                 key={day.toISOString()}
                 className={`py-2.5 text-center transition-colors ${
-                  isToday ? 'bg-[#00C2CB]/10' : ''
+                  isToday ? 'bg-white/[0.05]' : ''
                 }`}
               >
                 <div className="text-[10px] font-mono uppercase tracking-wider text-white/50">
@@ -643,9 +643,9 @@ const WeekView: React.FC<WeekViewProps> = ({
                   <span
                     className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all ${
                       isToday
-                        ? 'bg-[#00C2CB] text-[#0A0A0A] shadow-xs'
+                        ? 'bg-white text-black shadow-xs'
                         : isSelected
-                        ? 'bg-white text-black'
+                        ? 'bg-white/20 text-white'
                         : 'text-white'
                     }`}
                   >
@@ -715,8 +715,8 @@ const WeekView: React.FC<WeekViewProps> = ({
                       className="absolute left-0 right-0 z-20 flex items-center pointer-events-none"
                       style={{ top: `${(currentTimeMinutes / 60) * PIXELS_PER_HOUR}px` }}
                     >
-                      <div className="h-2 w-2 rounded-full bg-[#FF4FA3] -ml-1" />
-                      <div className="flex-1 border-t-2 border-[#FF4FA3]" />
+                      <div className="h-2 w-2 rounded-full bg-white -ml-1" />
+                      <div className="flex-1 border-t-2 border-white" />
                     </div>
                   )}
 
@@ -844,7 +844,7 @@ const MonthView: React.FC<MonthViewProps> = ({
                     <span
                       className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
                         isToday
-                          ? 'bg-[#00C2CB] text-[#0A0A0A] font-bold shadow-xs'
+                          ? 'bg-white text-black font-bold shadow-xs'
                           : 'text-white/70'
                       }`}
                     >

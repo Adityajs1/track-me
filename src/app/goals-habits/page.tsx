@@ -191,7 +191,7 @@ export default function GoalsAndHabitsPage() {
   const completedGoalsCount = goals.filter((g) => g.isCompleted).length;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-[#FF4FA3] selection:text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
       {/* Global Sidebar with proper route highlighting */}
       <Sidebar
         activeTab="goals"
@@ -275,7 +275,7 @@ export default function GoalsAndHabitsPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                    <Target className="h-7 w-7 text-[#00C2CB]" />
+                    <Target className="h-7 w-7 text-white" />
                     <span>Goals & Habits</span>
                   </h1>
                   <p className="text-xs text-white/50 mt-1">
@@ -321,7 +321,7 @@ export default function GoalsAndHabitsPage() {
                   ) : (
                     <button
                       onClick={() => setIsCreatingHabit(true)}
-                      className="flex items-center gap-1.5 rounded-xl bg-[#00C2CB] hover:bg-white text-black px-3.5 py-2 text-xs font-semibold shadow-xs transition-all cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-white/90 text-black px-3.5 py-2 text-xs font-semibold shadow-xs transition-all cursor-pointer"
                     >
                       <Plus className="h-3.5 w-3.5 stroke-[2]" />
                       <span>New Habit</span>
@@ -363,7 +363,7 @@ export default function GoalsAndHabitsPage() {
                         onClick={() => setGoalFilter('completed')}
                         className={`px-3 py-1 rounded-lg transition-all ${
                           goalFilter === 'completed'
-                            ? 'bg-emerald-500 text-black font-bold'
+                            ? 'bg-white text-black font-semibold'
                             : 'bg-white/[0.04] text-white/60 hover:text-white'
                         }`}
                       >
@@ -409,7 +409,7 @@ export default function GoalsAndHabitsPage() {
                             key={g.id}
                             onClick={() => setSelectedGoal(g)}
                             className={`glass-panel rounded-2xl p-5 hover:border-white/20 transition-all cursor-pointer relative group ${
-                              isDone ? 'border-emerald-500/40 bg-emerald-950/[0.08]' : ''
+                              isDone ? 'border-white/20 bg-white/[0.02]' : ''
                             }`}
                           >
                             <div className="flex items-start justify-between gap-3">
@@ -419,26 +419,26 @@ export default function GoalsAndHabitsPage() {
                                     {g.category}
                                   </span>
                                   {isDone && (
-                                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/10 text-white border border-white/20">
                                       <CheckCircle2 className="h-3 w-3" />
                                       <span>Completed</span>
                                     </span>
                                   )}
                                 </div>
-                                <h3 className={`text-base font-bold truncate mt-1 ${isDone ? 'text-emerald-300' : 'text-white'}`}>
+                                <h3 className={`text-base font-bold truncate mt-1 ${isDone ? 'text-white/60 line-through' : 'text-white'}`}>
                                   {g.name}
                                 </h3>
                               </div>
 
-                              {/* Unmistakable Green Completion Indicator Button */}
+                              {/* Black & White Completion Indicator Button */}
                               <button
                                 type="button"
                                 onClick={(e) => handleToggleGoalCompletion(g, e)}
                                 title={isDone ? 'Mark as active / re-open' : 'Mark goal as completed'}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm ${
                                   isDone
-                                    ? 'bg-emerald-500 text-black hover:bg-emerald-400'
-                                    : 'bg-white/[0.06] hover:bg-emerald-600/30 text-white/70 hover:text-emerald-300 border border-white/10'
+                                    ? 'bg-white text-black hover:bg-white/90'
+                                    : 'bg-white/[0.06] hover:bg-white/15 text-white/70 hover:text-white border border-white/10'
                                 }`}
                               >
                                 <CheckCircle2 className={`h-4 w-4 ${isDone ? 'stroke-[2.5]' : 'stroke-[1.5]'}`} />
@@ -454,7 +454,7 @@ export default function GoalsAndHabitsPage() {
                                 <span>{g._count?.tasks || 0} tasks</span>
                               </div>
                               {g.completedAt && (
-                                <span className="font-mono text-emerald-400/80">
+                                <span className="font-mono text-white/60">
                                   Completed {format(new Date(g.completedAt), 'MMM d, yyyy')}
                                 </span>
                               )}
@@ -474,9 +474,9 @@ export default function GoalsAndHabitsPage() {
                   {isCreatingHabit && (
                     <form
                       onSubmit={handleCreateHabit}
-                      className="glass-panel rounded-2xl p-5 space-y-4 border border-[#00C2CB]/30"
+                      className="glass-panel rounded-2xl p-5 space-y-4 border border-white/20"
                     >
-                      <h3 className="text-xs font-mono uppercase tracking-wider text-[#00C2CB] font-bold">
+                      <h3 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
                         Add New Recurring Habit
                       </h3>
 
@@ -525,7 +525,7 @@ export default function GoalsAndHabitsPage() {
                         <button
                           type="submit"
                           disabled={isSubmittingHabit}
-                          className="rounded-xl bg-[#00C2CB] hover:bg-white text-black px-4 py-1.5 text-xs font-semibold cursor-pointer"
+                          className="rounded-xl bg-white hover:bg-white/90 text-black px-4 py-1.5 text-xs font-semibold cursor-pointer"
                         >
                           {isSubmittingHabit ? 'Creating...' : 'Create Habit'}
                         </button>
@@ -555,7 +555,7 @@ export default function GoalsAndHabitsPage() {
                                 onClick={() => handleToggleHabit(h.id, isDoneToday)}
                                 className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                                   isDoneToday
-                                    ? 'bg-emerald-500 text-black shadow-xs'
+                                    ? 'bg-white text-black shadow-xs'
                                     : 'border border-white/20 hover:border-white text-transparent'
                                 }`}
                               >
@@ -581,7 +581,7 @@ export default function GoalsAndHabitsPage() {
 
                             <button
                               onClick={() => handleDeleteTask(h.id)}
-                              className="text-white/30 hover:text-rose-400 p-1.5 transition-colors cursor-pointer"
+                              className="text-white/30 hover:text-white p-1.5 transition-colors cursor-pointer"
                               title="Delete habit"
                             >
                               <Trash2 className="h-4 w-4" />

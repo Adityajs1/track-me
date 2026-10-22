@@ -42,7 +42,7 @@ export default function TimeBlockingPage() {
   if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center text-white">
-        <Loader2 className="h-8 w-8 animate-spin text-[#00C2CB] mb-3" />
+        <Loader2 className="h-8 w-8 animate-spin text-white mb-3" />
         <p className="text-xs text-white/50 font-mono">Authenticating session...</p>
       </div>
     );
@@ -68,7 +68,7 @@ export default function TimeBlockingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-[#FF4FA3] selection:text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
       {/* Sidebar with activeTab highlighting */}
       <Sidebar
         activeTab="timeblock"

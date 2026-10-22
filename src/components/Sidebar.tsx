@@ -179,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="flex items-center gap-2 truncate">
                     <span
                       className={`h-1.5 w-1.5 rounded-full shrink-0 ${
-                        g.isCompleted ? 'bg-emerald-400' : 'bg-white/70'
+                        g.isCompleted ? 'bg-white' : 'bg-white/40'
                       }`}
                     />
                     <span className="truncate">{g.name}</span>
@@ -199,7 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Streak & Points Tile */}
         <div className="flex items-center justify-between glass-panel px-3.5 py-2 rounded-xl text-xs">
           <div className="flex items-center gap-1.5 text-white font-medium">
-            <Flame className="h-3.5 w-3.5 stroke-[1.5] text-[#FF4FA3]" />
+            <Flame className="h-3.5 w-3.5 stroke-[1.5] text-white" />
             <span>{activeStreak}d streak</span>
           </div>
           <div className="text-white/50 text-[11px] font-mono">
@@ -211,7 +211,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {user ? (
           <div className="flex items-center justify-between glass-panel px-3 py-2 rounded-xl text-xs">
             <div className="flex items-center gap-2 truncate">
-              <div className="h-6 w-6 rounded-full bg-[#00C2CB] text-[#0A0A0A] flex items-center justify-center font-bold text-[10px] shrink-0">
+              <div className="h-6 w-6 rounded-full bg-white text-black flex items-center justify-center font-bold text-[10px] shrink-0">
                 {(user.name || user.email)[0].toUpperCase()}
               </div>
               <div className="truncate">
@@ -227,7 +227,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => logout()}
               title="Sign Out"
-              className="p-1 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/5 transition-colors cursor-pointer shrink-0 ml-1"
+              className="p-1 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 ml-1"
             >
               <LogOut className="h-3.5 w-3.5" />
             </button>

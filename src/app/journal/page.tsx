@@ -138,7 +138,7 @@ export default function JournalPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-[#FF4FA3] selection:text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
       {/* Sidebar with active tab */}
       <Sidebar
         activeTab="notes"
@@ -159,7 +159,7 @@ export default function JournalPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                <BookOpen className="h-7 w-7 text-[#FF4FA3]" />
+                <BookOpen className="h-7 w-7 text-white" />
                 <span>Journal & Reflections</span>
               </h1>
               <p className="text-xs text-white/50 mt-1">
@@ -192,10 +192,10 @@ export default function JournalPage() {
           {isCreating && (
             <form
               onSubmit={handleSubmit}
-              className="glass-panel rounded-2xl p-6 space-y-4 border border-[#FF4FA3]/30 animate-in fade-in"
+              className="glass-panel rounded-2xl p-6 space-y-4 border border-white/20 animate-in fade-in"
             >
               <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                <h3 className="text-xs font-mono uppercase tracking-wider text-[#FF4FA3] font-bold">
+                <h3 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
                   {editingNoteId ? 'Edit Journal Entry' : 'Create New Journal Entry'}
                 </h3>
                 <button
@@ -208,7 +208,7 @@ export default function JournalPage() {
               </div>
 
               {error && (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-400">
+                <div className="p-3 rounded-xl bg-white/[0.08] border border-white/20 text-xs text-white/80">
                   {error}
                 </div>
               )}
@@ -317,7 +317,7 @@ export default function JournalPage() {
                       </button>
                       <button
                         onClick={(e) => handleDelete(note.id, e)}
-                        className="p-1.5 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/10 transition-colors"
+                        className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
                         title="Delete entry"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

@@ -73,13 +73,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Section: Streak, Points & New Goal */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2.5 glass-panel px-3.5 py-1.5 rounded-full text-xs">
-            <div className="flex items-center gap-1 text-[#FF4FA3] font-semibold">
-              <Flame className="h-3.5 w-3.5 fill-[#FF4FA3]" />
+            <div className="flex items-center gap-1 text-white font-semibold">
+              <Flame className="h-3.5 w-3.5 fill-white text-white" />
               <span>{activeStreak}d streak</span>
             </div>
             <span className="text-white/20">|</span>
             <div className="text-white/80 font-medium">
-              <span className="font-bold text-[#00C2CB]">{totalPoints}</span> pts
+              <span className="font-bold text-white">{totalPoints}</span> pts
             </div>
           </div>
 
@@ -97,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => logout()}
                 title="Sign Out"
-                className="p-1.5 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/5 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
               </button>

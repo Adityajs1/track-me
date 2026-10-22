@@ -12,6 +12,8 @@ async function main() {
   await prisma.plan.deleteMany();
   await prisma.note.deleteMany();
   await prisma.goal.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.user.deleteMany();
 
   console.log('Database clean. Ready for dynamic user input.');
 }

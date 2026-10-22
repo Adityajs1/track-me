@@ -3,6 +3,8 @@
 import React from 'react';
 import { ZiffyLogo } from './ZiffyLogo';
 import { Target, CheckCircle2, Calendar, BookOpen, Flame, Plus, Bell, Home } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
   activeTab: 'goals' | 'checkin' | 'timeblock' | 'notes';
@@ -25,6 +27,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   unreadRemindersCount = 0,
   onToggleReminders,
 }) => {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleTimeBlockClick = () => {
+    if (!user) {
+      router.push('/login?redirect=/timeblocking');
+      return;
+    }
+    setActiveTab('timeblock');
+  };
   return (
     <header className="sticky top-0 z-30 border-b border-[#2E2E2E] bg-[#1B1B1B]/90 backdrop-blur-md text-white">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -64,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
-              onClick={() => setActiveTab('timeblock')}
+              onClick={handleTimeBlockClick}
               className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 activeTab === 'timeblock'
                   ? 'bg-[#232323] text-[#FF4FA3] border border-[#2E2E2E]'
@@ -153,7 +165,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           Check-in
         </button>
         <button
-          onClick={() => setActiveTab('timeblock')}
+          onClick={handleTimeBlockClick}
           className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap ${
             activeTab === 'timeblock'
               ? 'bg-[#232323] text-[#FF4FA3] border border-[#2E2E2E]'

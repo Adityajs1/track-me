@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { computeGoalMetrics } from '@/lib/summary';
+import { getAuthUser } from '@/lib/auth';
 
 export async function GET() {
   try {
+    const user = await getAuthUser();
+    const whereClause: Record<string, unknown> = {};
+    if (user) {
+      whereClause.OR = [{ userId: user.id }, { userId: null }];
+    }
+
     const goals = await prisma.goal.findMany({
+      where: whereClause,
       include: {
         plans: {
           include: {
@@ -65,8 +73,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const user = await getAuthUser();
+
     const goal = await prisma.goal.create({
       data: {
+        userId: user?.id || null,
         name: name.trim(),
         category: category.trim(),
         startDate: startDate ? new Date(startDate) : new Date(),

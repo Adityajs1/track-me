@@ -1,28 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { GoalData, TaskData, TimeBlockData, NoteData } from '@/lib/types';
+import { GoalData, TaskData, NoteData } from '@/lib/types';
+import { useAuth } from '@/lib/AuthContext';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { GoalsView } from '@/components/GoalsView';
 import { DailyCheckin } from '@/components/DailyCheckin';
 import { GoalDetailView } from '@/components/GoalDetailView';
 import { TimeBlockingView } from '@/components/TimeBlockingView';
 import { NotesView } from '@/components/NotesView';
-import { InAppReminderBanner } from '@/components/InAppReminderBanner';
 import { CreateGoalModal } from '@/components/Modal';
 import { LandingHero } from '@/components/LandingHero';
 import { format } from 'date-fns';
+import { Calendar, Lock, ArrowRight } from 'lucide-react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
+  const router = useRouter();
+  const { user } = useAuth();
+
   const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState<'goals' | 'checkin' | 'timeblock' | 'notes'>('goals');
   const [selectedGoal, setSelectedGoal] = useState<GoalData | null>(null);
   const [isNewGoalModalOpen, setIsNewGoalModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [showReminders, setShowReminders] = useState(true);
 
   const dateStr = format(selectedDate, 'yyyy-MM-dd');
 
@@ -32,11 +36,19 @@ export default function Home() {
     `/api/tasks?date=${dateStr}`,
     fetcher
   );
-  const { data: timeBlocks = [], mutate: mutateBlocks } = useSWR<TimeBlockData[]>(
-    `/api/timeblocks?date=${dateStr}`,
-    fetcher
-  );
   const { data: notes = [], mutate: mutateNotes } = useSWR<NoteData[]>('/api/notes', fetcher);
+
+  // Check URL query parameters for tab navigation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab') as 'goals' | 'checkin' | 'timeblock' | 'notes' | null;
+      if (tabParam && ['goals', 'checkin', 'timeblock', 'notes'].includes(tabParam)) {
+        setActiveTab(tabParam);
+        setShowLanding(false);
+      }
+    }
+  }, []);
 
   // Computed overall metrics across all goals
   const totalPoints = goals.reduce((acc, g) => acc + (g.metrics?.totalPoints || 0), 0);
@@ -150,30 +162,6 @@ export default function Home() {
     }
   };
 
-  const handleCreateTimeBlock = async (block: {
-    taskId?: string;
-    taskInstanceId?: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-  }) => {
-    const res = await fetch('/api/timeblocks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(block),
-    });
-    if (res.ok) {
-      mutateBlocks();
-    }
-  };
-
-  const handleDeleteTimeBlock = async (id: string) => {
-    const res = await fetch(`/api/timeblocks/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      mutateBlocks();
-    }
-  };
-
   const handleCreateNote = async (
     noteOrGoalId: { goalId: string | null; title: string; content: string } | string | null,
     maybeTitle?: string,
@@ -231,7 +219,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1B1B1B] text-white flex font-sans selection:bg-[#FF4FA3] selection:text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-[#FF4FA3] selection:text-white">
       {/* Notion-style Left Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -250,16 +238,7 @@ export default function Home() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto h-screen">
-        {/* Top subtle reminder banner */}
-        {showReminders && (
-          <InAppReminderBanner
-            timeBlocks={timeBlocks}
-            tasks={dailyTasks}
-            onDismiss={() => setShowReminders(false)}
-          />
-        )}
-
-        <main className="flex-1 px-6 sm:px-10 py-8">
+        <main className="flex-1 px-4 sm:px-8 py-6">
           {selectedGoal ? (
             <GoalDetailView
               goal={selectedGoal}
@@ -295,14 +274,33 @@ export default function Home() {
               )}
 
               {activeTab === 'timeblock' && (
-                <TimeBlockingView
-                  tasks={dailyTasks}
-                  timeBlocks={timeBlocks}
-                  selectedDate={selectedDate}
-                  onDateChange={setSelectedDate}
-                  onCreateTimeBlock={handleCreateTimeBlock}
-                  onDeleteTimeBlock={handleDeleteTimeBlock}
-                />
+                user ? (
+                  <TimeBlockingView
+                    tasks={dailyTasks}
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                  />
+                ) : (
+                  <div className="max-w-xl mx-auto my-12 glass-panel rounded-2xl p-8 text-center space-y-4">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.05] border border-white/10 text-[#00C2CB]">
+                      <Calendar className="h-6 w-6" />
+                    </div>
+                    <h2 className="text-xl font-bold text-white">
+                      Sign in to Access Time-Blocking
+                    </h2>
+                    <p className="text-xs text-white/50 max-w-sm mx-auto">
+                      Your time-blocking schedule is dynamically saved and encrypted to your personal user account with zero hardcoded data.
+                    </p>
+                    <button
+                      onClick={() => router.push('/login?redirect=/timeblocking')}
+                      className="inline-flex items-center gap-2 rounded-xl bg-white hover:bg-white/90 text-black px-5 py-2.5 text-xs font-semibold shadow-md transition-all cursor-pointer"
+                    >
+                      <Lock className="h-3.5 w-3.5" />
+                      <span>Sign In to Continue</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )
               )}
 
               {activeTab === 'notes' && (

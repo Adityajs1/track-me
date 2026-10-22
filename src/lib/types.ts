@@ -62,13 +62,26 @@ export interface TaskInstanceData {
   timeBlocks?: TimeBlockData[];
 }
 
+export interface UserData {
+  id: string;
+  email: string;
+  name?: string | null;
+  createdAt: string;
+}
+
 export interface TimeBlockData {
   id: string;
+  userId?: string | null;
+  title: string;
+  description?: string | null;
+  color: string;
   taskId: string | null;
   taskInstanceId: string | null;
   date: string;
   startTime: string;
   endTime: string;
+  createdAt?: string;
+  updatedAt?: string;
   task?: TaskData;
   taskInstance?: TaskInstanceData;
 }

@@ -3,6 +3,8 @@
 import React from 'react';
 import { GoalData } from '@/lib/types';
 import { ZiffyLogo } from './ZiffyLogo';
+import { useAuth } from '@/lib/AuthContext';
+import { useRouter } from 'next/navigation';
 import {
   Target,
   CheckCircle2,
@@ -10,7 +12,9 @@ import {
   BookOpen,
   Plus,
   Flame,
-  ChevronRight,
+  LogOut,
+  LogIn,
+  User,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -36,6 +40,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   totalPoints,
   activeStreak,
 }) => {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleTimeBlockTabClick = () => {
+    if (!user) {
+      router.push('/login?redirect=/timeblocking');
+      return;
+    }
+    setActiveTab('timeblock');
+  };
+
   return (
     <aside className="w-64 border-r border-white/10 bg-[#0A0A0A] flex flex-col justify-between shrink-0 h-screen sticky top-0 text-white select-none">
       {/* Top Section */}
@@ -94,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
 
           <button
-            onClick={() => setActiveTab('timeblock')}
+            onClick={handleTimeBlockTabClick}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
               activeTab === 'timeblock'
                 ? 'bg-white text-black font-semibold shadow-xs'
@@ -105,6 +120,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Calendar className="h-4 w-4 stroke-[1.5]" />
               <span>Time-Blocking</span>
             </div>
+            {!user && (
+              <span className="text-[9px] px-1 py-0.2 rounded bg-white/10 text-white/40 font-mono">
+                Auth
+              </span>
+            )}
           </button>
 
           <button
@@ -122,13 +142,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Goals Tree (Dynamic Database hierarchy) */}
+        {/* Goals Tree */}
         <div className="space-y-1.5 pt-2">
           <div className="flex items-center justify-between px-2 pb-1 text-[10px] font-mono uppercase tracking-wider text-white/40">
             <span>Your Goals</span>
             <button
               onClick={onOpenNewGoal}
-              className="p-1 rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+              className="p-1 rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-pointer"
               title="Add a new goal"
             >
               <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
@@ -165,9 +185,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Bottom Footer: Stats & New Goal Button */}
+      {/* Bottom Footer: Stats, User Profile & New Goal Button */}
       <div className="p-4 border-t border-white/10 bg-[#0A0A0A] space-y-3">
-        <div className="flex items-center justify-between glass-panel px-3.5 py-2.5 rounded-xl text-xs">
+        {/* Streak & Points */}
+        <div className="flex items-center justify-between glass-panel px-3.5 py-2 rounded-xl text-xs">
           <div className="flex items-center gap-1.5 text-white font-medium">
             <Flame className="h-3.5 w-3.5 stroke-[1.5]" />
             <span>{activeStreak}d streak</span>
@@ -176,6 +197,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="font-semibold text-white">{totalPoints}</span> pts
           </div>
         </div>
+
+        {/* User Account / Auth Section */}
+        {user ? (
+          <div className="flex items-center justify-between glass-panel px-3 py-2 rounded-xl text-xs">
+            <div className="flex items-center gap-2 truncate">
+              <div className="h-6 w-6 rounded-full bg-[#00C2CB] text-[#0A0A0A] flex items-center justify-center font-bold text-[10px] shrink-0">
+                {(user.name || user.email)[0].toUpperCase()}
+              </div>
+              <div className="truncate">
+                <div className="font-semibold truncate text-[11px] text-white">
+                  {user.name || 'User'}
+                </div>
+                <div className="text-[9px] text-white/40 truncate font-mono">
+                  {user.email}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => logout()}
+              title="Sign Out"
+              className="p-1 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/5 transition-colors cursor-pointer shrink-0 ml-1"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => router.push('/login?redirect=/timeblocking')}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/[0.05] hover:bg-white/10 border border-white/10 text-white/80 hover:text-white px-3 py-2 text-xs font-medium transition-all cursor-pointer"
+          >
+            <LogIn className="h-3.5 w-3.5" />
+            <span>Sign In</span>
+          </button>
+        )}
 
         <button
           onClick={onOpenNewGoal}

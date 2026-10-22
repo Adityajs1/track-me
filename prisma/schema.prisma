@@ -11,16 +11,18 @@ datasource db {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  email        String      @unique
+  id           String         @id @default(cuid())
+  email        String         @unique
   name         String?
   passwordHash String
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   sessions     Session[]
   goals        Goal[]
   timeBlocks   TimeBlock[]
+  notes        Note[]
+  checkIns     DailyCheckIn[]
 }
 
 model Session {
@@ -40,6 +42,8 @@ model Goal {
   category    String
   startDate   DateTime  @default(now())
   endDate     DateTime?
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -71,6 +75,7 @@ model Task {
   targetDate  DateTime?
   done        Boolean        @default(false)
   isRecurring Boolean        @default(false)
+  frequency   String         @default("daily")
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
@@ -112,10 +117,26 @@ model TimeBlock {
 
 model Note {
   id          String    @id @default(cuid())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   goalId      String?
   goal        Goal?     @relation(fields: [goalId], references: [id], onDelete: Cascade)
   title       String?
   content     String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model DailyCheckIn {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime
+  energy     Int?     // 1 to 5 scale
+  mood       String?  // Great, Good, Neutral, Tired
+  reflection String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, date])
 }

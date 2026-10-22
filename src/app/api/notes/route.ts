@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthUser } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
+    const user = await getAuthUser();
     const { searchParams } = new URL(req.url);
     const goalId = searchParams.get('goalId');
     const filter = searchParams.get('filter'); // 'all', 'goal', 'general'
 
     const whereClause: Record<string, unknown> = {};
+    if (user) {
+      whereClause.OR = [{ userId: user.id }, { userId: null }];
+    }
 
     if (goalId) {
       whereClause.goalId = goalId;
@@ -36,6 +41,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await getAuthUser();
     const body = await req.json();
     const { goalId, title, content } = body;
 
@@ -45,6 +51,7 @@ export async function POST(req: NextRequest) {
 
     const note = await prisma.note.create({
       data: {
+        userId: user?.id || null,
         goalId: goalId || null,
         title: title?.trim() || null,
         content: content.trim(),

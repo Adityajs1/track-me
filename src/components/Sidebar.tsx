@@ -4,8 +4,10 @@ import React from 'react';
 import { GoalData } from '@/lib/types';
 import { ZiffyLogo } from './ZiffyLogo';
 import { useAuth } from '@/lib/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import {
+  LayoutDashboard,
   Target,
   CheckCircle2,
   Calendar,
@@ -14,24 +16,22 @@ import {
   Flame,
   LogOut,
   LogIn,
-  User,
+  Award,
 } from 'lucide-react';
 
 interface SidebarProps {
-  activeTab: 'goals' | 'checkin' | 'timeblock' | 'notes';
-  setActiveTab: (tab: 'goals' | 'checkin' | 'timeblock' | 'notes') => void;
+  activeTab?: string;
+  setActiveTab?: (tab: any) => void;
   goals: GoalData[];
-  selectedGoalId: string | null;
-  onSelectGoal: (goal: GoalData) => void;
+  selectedGoalId?: string | null;
+  onSelectGoal?: (goal: GoalData) => void;
   onOpenNewGoal: () => void;
-  onOpenLanding: () => void;
+  onOpenLanding?: () => void;
   totalPoints: number;
   activeStreak: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  activeTab,
-  setActiveTab,
   goals,
   selectedGoalId,
   onSelectGoal,
@@ -42,13 +42,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
-  const handleTimeBlockTabClick = () => {
-    if (!user) {
-      router.push('/login?redirect=/timeblocking');
+  const navItems = [
+    {
+      name: 'Overview & Heatmap',
+      href: '/',
+      icon: LayoutDashboard,
+      isActive: pathname === '/',
+    },
+    {
+      name: 'Goals & Habits',
+      href: '/goals-habits',
+      icon: Target,
+      badge: goals.length,
+      isActive: pathname.startsWith('/goals'),
+    },
+    {
+      name: 'Daily Check-In',
+      href: '/daily-check-in',
+      icon: CheckCircle2,
+      isActive: pathname.startsWith('/daily-check-in') || pathname.startsWith('/check'),
+    },
+    {
+      name: 'Time-Blocking',
+      href: '/time-blocking',
+      icon: Calendar,
+      isActive: pathname.startsWith('/time-blocking') || pathname.startsWith('/timeblocking'),
+    },
+    {
+      name: 'Journal & Notes',
+      href: '/journal',
+      icon: BookOpen,
+      isActive: pathname.startsWith('/journal') || pathname.startsWith('/notes'),
+    },
+  ];
+
+  const handleNavClick = (href: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user && href !== '/') {
+      router.push(`/login?redirect=${encodeURIComponent(href)}`);
       return;
     }
-    setActiveTab('timeblock');
+    router.push(href);
   };
 
   return (
@@ -57,92 +93,58 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* Workspace Brand Header */}
         <div className="flex items-center justify-between px-1 py-1">
-          <button
-            onClick={onOpenLanding}
+          <Link
+            href="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity text-left cursor-pointer focus:outline-none"
           >
             <ZiffyLogo size="sm" />
-          </button>
+          </Link>
         </div>
 
-        {/* Core Navigation Views */}
+        {/* Core Navigation Views (Each links to its distinct dedicated route) */}
         <div className="space-y-1">
           <div className="px-2 pb-1.5 text-[10px] font-mono uppercase tracking-wider text-white/40">
             Workspace
           </div>
 
-          <button
-            onClick={() => setActiveTab('goals')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'goals' && !selectedGoalId
-                ? 'bg-white text-black font-semibold shadow-xs'
-                : 'text-white/70 hover:bg-white/[0.05] hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Target className="h-4 w-4 stroke-[1.5]" />
-              <span>Goals & Habits</span>
-            </div>
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                activeTab === 'goals' && !selectedGoalId
-                  ? 'bg-black/10 text-black'
-                  : 'bg-white/10 text-white/50'
-              }`}
-            >
-              {goals.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('checkin')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'checkin'
-                ? 'bg-white text-black font-semibold shadow-xs'
-                : 'text-white/70 hover:bg-white/[0.05] hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="h-4 w-4 stroke-[1.5]" />
-              <span>Daily Check-in</span>
-            </div>
-          </button>
-
-          <button
-            onClick={handleTimeBlockTabClick}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'timeblock'
-                ? 'bg-white text-black font-semibold shadow-xs'
-                : 'text-white/70 hover:bg-white/[0.05] hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Calendar className="h-4 w-4 stroke-[1.5]" />
-              <span>Time-Blocking</span>
-            </div>
-            {!user && (
-              <span className="text-[9px] px-1 py-0.2 rounded bg-white/10 text-white/40 font-mono">
-                Auth
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('notes')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'notes'
-                ? 'bg-white text-black font-semibold shadow-xs'
-                : 'text-white/70 hover:bg-white/[0.05] hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <BookOpen className="h-4 w-4 stroke-[1.5]" />
-              <span>Journal & Notes</span>
-            </div>
-          </button>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.href}
+                onClick={(e) => handleNavClick(item.href, e)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                  item.isActive
+                    ? 'bg-white text-black font-semibold shadow-xs'
+                    : 'text-white/70 hover:bg-white/[0.05] hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 truncate">
+                  <Icon className="h-4 w-4 stroke-[1.5] shrink-0" />
+                  <span className="truncate">{item.name}</span>
+                </div>
+                {item.badge !== undefined && (
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                      item.isActive
+                        ? 'bg-black/10 text-black'
+                        : 'bg-white/10 text-white/50'
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+                {!user && item.href !== '/' && (
+                  <span className="text-[9px] px-1 rounded bg-white/10 text-white/40 font-mono">
+                    Auth
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Goals Tree */}
+        {/* Goals List (Links to Goal detail view under Goals & Habits) */}
         <div className="space-y-1.5 pt-2">
           <div className="flex items-center justify-between px-2 pb-1 text-[10px] font-mono uppercase tracking-wider text-white/40">
             <span>Your Goals</span>
@@ -164,7 +166,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {goals.map((g) => (
                 <button
                   key={g.id}
-                  onClick={() => onSelectGoal(g)}
+                  onClick={() => {
+                    if (onSelectGoal) onSelectGoal(g);
+                    router.push(`/goals-habits?goal=${g.id}`);
+                  }}
                   className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-all text-left cursor-pointer ${
                     selectedGoalId === g.id
                       ? 'bg-white/15 text-white font-semibold'
@@ -172,7 +177,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }`}
                 >
                   <div className="flex items-center gap-2 truncate">
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/70 shrink-0" />
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                        g.isCompleted ? 'bg-emerald-400' : 'bg-white/70'
+                      }`}
+                    />
                     <span className="truncate">{g.name}</span>
                   </div>
                   <span className="text-[10px] text-white/30 truncate ml-1 font-mono">
@@ -185,12 +194,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Bottom Footer: Stats, User Profile & New Goal Button */}
+      {/* Bottom Footer: Stats, User Profile & New Goal Action */}
       <div className="p-4 border-t border-white/10 bg-[#0A0A0A] space-y-3">
-        {/* Streak & Points */}
+        {/* Streak & Points Tile */}
         <div className="flex items-center justify-between glass-panel px-3.5 py-2 rounded-xl text-xs">
           <div className="flex items-center gap-1.5 text-white font-medium">
-            <Flame className="h-3.5 w-3.5 stroke-[1.5]" />
+            <Flame className="h-3.5 w-3.5 stroke-[1.5] text-[#FF4FA3]" />
             <span>{activeStreak}d streak</span>
           </div>
           <div className="text-white/50 text-[11px] font-mono">
@@ -225,7 +234,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         ) : (
           <button
-            onClick={() => router.push('/login?redirect=/timeblocking')}
+            onClick={() => router.push('/login')}
             className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/[0.05] hover:bg-white/10 border border-white/10 text-white/80 hover:text-white px-3 py-2 text-xs font-medium transition-all cursor-pointer"
           >
             <LogIn className="h-3.5 w-3.5" />

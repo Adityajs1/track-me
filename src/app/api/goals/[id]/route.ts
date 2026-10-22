@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { computeGoalMetrics } from '@/lib/summary';
+import { getAuthUser } from '@/lib/auth';
 
 export async function GET(
   _req: NextRequest,
@@ -69,15 +70,30 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
     const { id } = await params;
+
+    const existing = await prisma.goal.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
+    }
+
+    if (user && existing.userId && existing.userId !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const body = await req.json();
-    const { name, category, startDate, endDate } = body;
+    const { name, category, startDate, endDate, isCompleted } = body;
 
     const dataToUpdate: Record<string, unknown> = {};
     if (name !== undefined) dataToUpdate.name = name.trim();
     if (category !== undefined) dataToUpdate.category = category.trim();
     if (startDate !== undefined) dataToUpdate.startDate = new Date(startDate);
     if (endDate !== undefined) dataToUpdate.endDate = endDate ? new Date(endDate) : null;
+    if (isCompleted !== undefined) {
+      dataToUpdate.isCompleted = Boolean(isCompleted);
+      dataToUpdate.completedAt = isCompleted ? new Date() : null;
+    }
 
     const updated = await prisma.goal.update({
       where: { id },
@@ -96,7 +112,18 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
     const { id } = await params;
+
+    const existing = await prisma.goal.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
+    }
+
+    if (user && existing.userId && existing.userId !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     await prisma.goal.delete({
       where: { id },
     });

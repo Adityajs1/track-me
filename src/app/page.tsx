@@ -1,20 +1,30 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import useSWR from 'swr';
-import { GoalData, TaskData, NoteData } from '@/lib/types';
+import { GoalData, TaskData, NoteData, ProductivityOverviewData, DailyCheckInData, TimeBlockData } from '@/lib/types';
 import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
-import { GoalsView } from '@/components/GoalsView';
-import { DailyCheckin } from '@/components/DailyCheckin';
-import { GoalDetailView } from '@/components/GoalDetailView';
-import { TimeBlockingView } from '@/components/TimeBlockingView';
-import { NotesView } from '@/components/NotesView';
+import { ProductivityHeatmap } from '@/components/ProductivityHeatmap';
 import { CreateGoalModal } from '@/components/Modal';
 import { LandingHero } from '@/components/LandingHero';
 import { format } from 'date-fns';
-import { Calendar, Lock, ArrowRight } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Target,
+  CheckCircle2,
+  Calendar,
+  BookOpen,
+  ArrowRight,
+  Flame,
+  Plus,
+  Check,
+  Zap,
+  Clock,
+  Sparkles,
+} from 'lucide-react';
+import Link from 'next/link';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -22,39 +32,46 @@ export default function Home() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [showLanding, setShowLanding] = useState(true);
-  const [activeTab, setActiveTab] = useState<'goals' | 'checkin' | 'timeblock' | 'notes'>('goals');
-  const [selectedGoal, setSelectedGoal] = useState<GoalData | null>(null);
+  const [showLanding, setShowLanding] = useState(!user);
   const [isNewGoalModalOpen, setIsNewGoalModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  const dateStr = format(selectedDate, 'yyyy-MM-dd');
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-  // SWR data hooks
-  const { data: goals = [], mutate: mutateGoals } = useSWR<GoalData[]>('/api/goals', fetcher);
-  const { data: dailyTasks = [], mutate: mutateTasks } = useSWR<TaskData[]>(
-    `/api/tasks?date=${dateStr}`,
+  // Load Goals
+  const { data: goals = [], mutate: mutateGoals } = useSWR<GoalData[]>(
+    user ? '/api/goals' : null,
     fetcher
   );
-  const { data: notes = [], mutate: mutateNotes } = useSWR<NoteData[]>('/api/notes', fetcher);
 
-  // Check URL query parameters for tab navigation
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get('tab') as 'goals' | 'checkin' | 'timeblock' | 'notes' | null;
-      if (tabParam && ['goals', 'checkin', 'timeblock', 'notes'].includes(tabParam)) {
-        setActiveTab(tabParam);
-        setShowLanding(false);
-      }
-    }
-  }, []);
+  // Load Productivity Heatmap Data (Unified across goals, habits, check-ins)
+  const { data: heatmapData, mutate: mutateHeatmap } = useSWR<ProductivityOverviewData>(
+    user ? '/api/productivity/heatmap?days=90' : null,
+    fetcher
+  );
 
-  // Computed overall metrics across all goals
+  // Load today's check-in
+  const { data: todayCheckIn } = useSWR<DailyCheckInData | null>(
+    user ? `/api/checkins?date=${todayStr}` : null,
+    fetcher
+  );
+
+  // Load today's time blocks
+  const { data: todayBlocks = [] } = useSWR<TimeBlockData[]>(
+    user ? `/api/timeblocks?date=${todayStr}` : null,
+    fetcher
+  );
+
+  // Load recent notes
+  const { data: recentNotes = [] } = useSWR<NoteData[]>(
+    user ? '/api/notes' : null,
+    fetcher
+  );
+
+  // Overall metrics
   const totalPoints = goals.reduce((acc, g) => acc + (g.metrics?.totalPoints || 0), 0);
-  const activeStreak = goals.reduce((max, g) => Math.max(max, g.metrics?.currentStreak || 0), 0);
+  const activeStreak = heatmapData?.currentStreak || goals.reduce((max, g) => Math.max(max, g.metrics?.currentStreak || 0), 0);
+  const completedGoalsCount = goals.filter((g) => g.isCompleted).length;
 
-  // Handlers
   const handleCreateGoal = async (goalInput: {
     name: string;
     category: string;
@@ -68,153 +85,11 @@ export default function Home() {
     });
     if (res.ok) {
       mutateGoals();
+      mutateHeatmap();
     }
   };
 
-  const handleDeleteGoal = async (id: string) => {
-    const res = await fetch(`/api/goals/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setSelectedGoal(null);
-      mutateGoals();
-    }
-  };
-
-  const handleUpdateGoal = async (id: string, updates: Partial<GoalData>) => {
-    const res = await fetch(`/api/goals/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates),
-    });
-    if (res.ok) {
-      mutateGoals();
-    }
-  };
-
-  const handleToggleTask = async (taskId: string, done: boolean) => {
-    const res = await fetch(`/api/tasks/${taskId}/toggle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: dateStr, done }),
-    });
-    if (res.ok) {
-      mutateTasks();
-      mutateGoals();
-      if (selectedGoal) {
-        const updatedGoalRes = await fetch(`/api/goals/${selectedGoal.id}`);
-        if (updatedGoalRes.ok) {
-          setSelectedGoal(await updatedGoalRes.json());
-        }
-      }
-    }
-  };
-
-  const handleAddPlan = async (goalId: string, name: string, startDate: string, endDate: string) => {
-    const res = await fetch('/api/plans', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ goalId, name, startDate, endDate }),
-    });
-    if (res.ok) {
-      mutateGoals();
-      if (selectedGoal) {
-        const updated = await fetch(`/api/goals/${selectedGoal.id}`).then((r) => r.json());
-        setSelectedGoal(updated);
-      }
-    }
-  };
-
-  const handleDeletePlan = async (planId: string) => {
-    const res = await fetch(`/api/plans/${planId}`, { method: 'DELETE' });
-    if (res.ok) {
-      mutateGoals();
-      if (selectedGoal) {
-        const updated = await fetch(`/api/goals/${selectedGoal.id}`).then((r) => r.json());
-        setSelectedGoal(updated);
-      }
-    }
-  };
-
-  const handleAddTask = async (taskData: Partial<TaskData>) => {
-    const res = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(taskData),
-    });
-    if (res.ok) {
-      mutateTasks();
-      mutateGoals();
-      if (selectedGoal) {
-        const updated = await fetch(`/api/goals/${selectedGoal.id}`).then((r) => r.json());
-        setSelectedGoal(updated);
-      }
-    }
-  };
-
-  const handleDeleteTask = async (taskId: string) => {
-    const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
-    if (res.ok) {
-      mutateTasks();
-      mutateGoals();
-      if (selectedGoal) {
-        const updated = await fetch(`/api/goals/${selectedGoal.id}`).then((r) => r.json());
-        setSelectedGoal(updated);
-      }
-    }
-  };
-
-  const handleCreateNote = async (
-    noteOrGoalId: { goalId: string | null; title: string; content: string } | string | null,
-    maybeTitle?: string,
-    maybeContent?: string
-  ) => {
-    let payload;
-    if (typeof noteOrGoalId === 'object' && noteOrGoalId !== null) {
-      payload = noteOrGoalId;
-    } else {
-      payload = {
-        goalId: noteOrGoalId || null,
-        title: maybeTitle || '',
-        content: maybeContent || '',
-      };
-    }
-
-    const res = await fetch('/api/notes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      mutateNotes();
-      if (selectedGoal) {
-        const updated = await fetch(`/api/goals/${selectedGoal.id}`).then((r) => r.json());
-        setSelectedGoal(updated);
-      }
-    }
-  };
-
-  const handleDeleteNote = async (id: string) => {
-    const res = await fetch(`/api/notes/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      mutateNotes();
-      if (selectedGoal) {
-        const updated = await fetch(`/api/goals/${selectedGoal.id}`).then((r) => r.json());
-        setSelectedGoal(updated);
-      }
-    }
-  };
-
-  const handleSelectGoal = async (g: GoalData) => {
-    const res = await fetch(`/api/goals/${g.id}`);
-    if (res.ok) {
-      setSelectedGoal(await res.json());
-    } else {
-      setSelectedGoal(g);
-    }
-    setActiveTab('goals');
-  };
-
-  // If landing page is active
-  if (showLanding) {
+  if (!user && showLanding) {
     return <LandingHero onGetStarted={() => setShowLanding(false)} />;
   }
 
@@ -222,97 +97,213 @@ export default function Home() {
     <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-[#FF4FA3] selection:text-white">
       {/* Notion-style Left Sidebar */}
       <Sidebar
-        activeTab={activeTab}
-        setActiveTab={(tab) => {
-          setSelectedGoal(null);
-          setActiveTab(tab);
-        }}
         goals={goals}
-        selectedGoalId={selectedGoal?.id || null}
-        onSelectGoal={handleSelectGoal}
+        selectedGoalId={null}
+        onSelectGoal={(g) => router.push(`/goals-habits?goal=${g.id}`)}
         onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
         onOpenLanding={() => setShowLanding(true)}
         totalPoints={totalPoints}
         activeStreak={activeStreak}
       />
 
-      {/* Main Content Area */}
+      {/* Main Overview Dashboard */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto h-screen">
-        <main className="flex-1 px-4 sm:px-8 py-6">
-          {selectedGoal ? (
-            <GoalDetailView
-              goal={selectedGoal}
-              onBack={() => setSelectedGoal(null)}
-              onUpdateGoal={handleUpdateGoal}
-              onDeleteGoal={handleDeleteGoal}
-              onAddPlan={handleAddPlan}
-              onDeletePlan={handleDeletePlan}
-              onAddTask={handleAddTask}
-              onDeleteTask={handleDeleteTask}
-              onToggleTask={handleToggleTask}
-              onAddNote={handleCreateNote}
-              onDeleteNote={handleDeleteNote}
-            />
+        <main className="flex-1 px-4 sm:px-8 py-8 max-w-6xl w-full mx-auto space-y-8">
+          {/* Dashboard Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-mono text-white/50 uppercase tracking-wider mb-1">
+                <span>Productivity Command Center</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2.5">
+                <span>Welcome back, {user?.name || user?.email?.split('@')[0] || 'Member'}</span>
+                <span className="text-xl">⚡</span>
+              </h1>
+              <p className="text-xs text-white/50 mt-1">
+                {format(new Date(), 'EEEE, MMMM d, yyyy')} · Your central productivity overview and completion metrics.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsNewGoalModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-white/90 text-black px-4 py-2 text-xs font-semibold shadow-xs transition-all cursor-pointer self-start sm:self-auto"
+            >
+              <Plus className="h-3.5 w-3.5 stroke-[2]" />
+              <span>New Goal</span>
+            </button>
+          </div>
+
+          {/* SECTION 1: UNIFIED PRODUCTIVITY HEATMAP */}
+          {heatmapData ? (
+            <ProductivityHeatmap data={heatmapData} />
           ) : (
-            <>
-              {activeTab === 'goals' && (
-                <GoalsView
-                  goals={goals}
-                  onSelectGoal={handleSelectGoal}
-                  onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
-                  onDeleteGoal={handleDeleteGoal}
-                />
-              )}
-
-              {activeTab === 'checkin' && (
-                <DailyCheckin
-                  tasks={dailyTasks}
-                  goals={goals}
-                  onToggleTask={handleToggleTask}
-                  onSelectGoal={handleSelectGoal}
-                />
-              )}
-
-              {activeTab === 'timeblock' && (
-                user ? (
-                  <TimeBlockingView
-                    tasks={dailyTasks}
-                    selectedDate={selectedDate}
-                    onDateChange={setSelectedDate}
-                  />
-                ) : (
-                  <div className="max-w-xl mx-auto my-12 glass-panel rounded-2xl p-8 text-center space-y-4">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.05] border border-white/10 text-[#00C2CB]">
-                      <Calendar className="h-6 w-6" />
-                    </div>
-                    <h2 className="text-xl font-bold text-white">
-                      Sign in to Access Time-Blocking
-                    </h2>
-                    <p className="text-xs text-white/50 max-w-sm mx-auto">
-                      Your time-blocking schedule is dynamically saved and encrypted to your personal user account with zero hardcoded data.
-                    </p>
-                    <button
-                      onClick={() => router.push('/login?redirect=/timeblocking')}
-                      className="inline-flex items-center gap-2 rounded-xl bg-white hover:bg-white/90 text-black px-5 py-2.5 text-xs font-semibold shadow-md transition-all cursor-pointer"
-                    >
-                      <Lock className="h-3.5 w-3.5" />
-                      <span>Sign In to Continue</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                )
-              )}
-
-              {activeTab === 'notes' && (
-                <NotesView
-                  notes={notes}
-                  goals={goals}
-                  onCreateNote={handleCreateNote}
-                  onDeleteNote={handleDeleteNote}
-                />
-              )}
-            </>
+            <div className="glass-panel rounded-2xl p-8 text-center text-xs text-white/40">
+              Loading your live productivity heatmap...
+            </div>
           )}
+
+          {/* SECTION 2: MODULAR FEATURE HUBS (Clean, uncluttered cards linking to dedicated pages) */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-mono uppercase tracking-wider text-white/50">
+                Dedicated Feature Hubs
+              </h2>
+              <span className="text-[11px] text-white/40">
+                Click any hub to open its dedicated workspace
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* HUB 1: GOALS & HABITS */}
+              <div className="glass-panel rounded-2xl p-6 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[#00C2CB]">
+                      <Target className="h-5 w-5" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Goals & Habits</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/10 text-white/60">
+                      {goals.length} Goals
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-white/60">
+                    Establish milestone goals with green completion tracking and recurring daily habits.
+                  </p>
+
+                  <div className="flex items-center gap-3 pt-2 text-xs font-mono">
+                    <span className="text-emerald-400 flex items-center gap-1">
+                      <Check className="h-3.5 w-3.5" />
+                      <strong>{completedGoalsCount}</strong> Completed
+                    </span>
+                    <span className="text-white/40">•</span>
+                    <span className="text-white/80">
+                      <strong>{goals.length - completedGoalsCount}</strong> Active
+                    </span>
+                  </div>
+                </div>
+
+                <Link
+                  href="/goals-habits"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-white hover:text-[#00C2CB] transition-colors pt-2 border-t border-white/10"
+                >
+                  <span>Open Goals & Habits Workspace</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              {/* HUB 2: DAILY CHECK-IN */}
+              <div className="glass-panel rounded-2xl p-6 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[#FF4FA3]">
+                      <CheckCircle2 className="h-5 w-5" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Daily Check-In</span>
+                    </div>
+                    {todayCheckIn ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        Completed Today ✓
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-300">
+                        Pending Today
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-white/60">
+                    Record your energy levels, mindset, wins, and reflections for continuous momentum.
+                  </p>
+
+                  <div className="pt-2 text-xs text-white/50">
+                    {todayCheckIn?.reflection ? (
+                      <span className="italic line-clamp-1">&ldquo;{todayCheckIn.reflection}&rdquo;</span>
+                    ) : (
+                      <span>Take 60 seconds to complete today&apos;s reflection.</span>
+                    )}
+                  </div>
+                </div>
+
+                <Link
+                  href="/daily-check-in"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-white hover:text-[#FF4FA3] transition-colors pt-2 border-t border-white/10"
+                >
+                  <span>{todayCheckIn ? 'Review Daily Check-In' : 'Complete Daily Check-In'}</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              {/* HUB 3: TIME BLOCKING */}
+              <div className="glass-panel rounded-2xl p-6 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[#3B82F6]">
+                      <Calendar className="h-5 w-5" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Time-Blocking</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/10 text-white/60">
+                      {todayBlocks.length} Scheduled Today
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-white/60">
+                    Day, Week, and Month calendar timeline inspired by Google Calendar for hourly allocation.
+                  </p>
+
+                  <div className="pt-2 text-xs text-white/50">
+                    {todayBlocks.length > 0 ? (
+                      <span>Next block: <strong className="text-white">{todayBlocks[0].title}</strong> ({todayBlocks[0].startTime})</span>
+                    ) : (
+                      <span>No time blocks scheduled for today yet.</span>
+                    )}
+                  </div>
+                </div>
+
+                <Link
+                  href="/time-blocking"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-white hover:text-[#3B82F6] transition-colors pt-2 border-t border-white/10"
+                >
+                  <span>Open Calendar Timeline</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              {/* HUB 4: JOURNAL & NOTES */}
+              <div className="glass-panel rounded-2xl p-6 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-purple-400">
+                      <BookOpen className="h-5 w-5" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Journal & Notes</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/10 text-white/60">
+                      {recentNotes.length} Entries
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-white/60">
+                    Private, distraction-free writing environment for structured notes and thoughts.
+                  </p>
+
+                  <div className="pt-2 text-xs text-white/50">
+                    {recentNotes.length > 0 ? (
+                      <span className="truncate block">Latest: <strong className="text-white">{recentNotes[0].title || 'Untitled note'}</strong></span>
+                    ) : (
+                      <span>Your private journal is ready for your first note.</span>
+                    )}
+                  </div>
+                </div>
+
+                <Link
+                  href="/journal"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-white hover:text-purple-400 transition-colors pt-2 border-t border-white/10"
+                >
+                  <span>Open Journal Workspace</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
         </main>
       </div>
 

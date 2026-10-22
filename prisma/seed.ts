@@ -6,6 +6,7 @@ async function main() {
   console.log('Resetting database to clean initial state (Zero hardcoded data)...');
 
   // Clean all records
+  await prisma.dailyCheckIn.deleteMany();
   await prisma.timeBlock.deleteMany();
   await prisma.taskInstance.deleteMany();
   await prisma.task.deleteMany();

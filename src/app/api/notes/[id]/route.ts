@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthUser } from '@/lib/auth';
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
     const { id } = await params;
+
+    const existing = await prisma.note.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Note not found' }, { status: 404 });
+    }
+
+    if (user && existing.userId && existing.userId !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const body = await req.json();
     const { title, content, goalId } = body;
 
@@ -35,7 +47,18 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getAuthUser();
     const { id } = await params;
+
+    const existing = await prisma.note.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Note not found' }, { status: 404 });
+    }
+
+    if (user && existing.userId && existing.userId !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     await prisma.note.delete({
       where: { id },
     });

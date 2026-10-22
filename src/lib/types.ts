@@ -1,9 +1,19 @@
+export interface UserData {
+  id: string;
+  email: string;
+  name?: string | null;
+  createdAt: string;
+}
+
 export interface GoalData {
   id: string;
+  userId?: string | null;
   name: string;
   category: string;
   startDate: string;
   endDate: string | null;
+  isCompleted?: boolean;
+  completedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   plans?: PlanData[];
@@ -36,6 +46,7 @@ export interface TaskData {
   targetDate: string | null;
   done: boolean;
   isRecurring: boolean;
+  frequency?: string;
   createdAt: string;
   updatedAt: string;
   instances?: TaskInstanceData[];
@@ -62,13 +73,6 @@ export interface TaskInstanceData {
   timeBlocks?: TimeBlockData[];
 }
 
-export interface UserData {
-  id: string;
-  email: string;
-  name?: string | null;
-  createdAt: string;
-}
-
 export interface TimeBlockData {
   id: string;
   userId?: string | null;
@@ -88,6 +92,7 @@ export interface TimeBlockData {
 
 export interface NoteData {
   id: string;
+  userId?: string | null;
   goalId: string | null;
   title: string | null;
   content: string;
@@ -98,6 +103,17 @@ export interface NoteData {
     name: string;
     category: string;
   } | null;
+}
+
+export interface DailyCheckInData {
+  id: string;
+  userId: string;
+  date: string; // YYYY-MM-DD
+  energy?: number | null;
+  mood?: string | null;
+  reflection?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type HeatmapColor = 'none' | 'green' | 'yellow' | 'red';
@@ -117,4 +133,23 @@ export interface GoalMetrics {
   longestStreak: number;
   totalCompletedTasks: number;
   daysSummary: DaySummary[];
+}
+
+export interface ProductivityDayData {
+  date: string; // YYYY-MM-DD
+  totalEvents: number;
+  goalsCompletedCount: number;
+  habitsCompletedCount: number;
+  hasCheckIn: boolean;
+  intensity: 0 | 1 | 2 | 3 | 4;
+}
+
+export interface ProductivityOverviewData {
+  totalEvents: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalGoalsCompleted: number;
+  totalHabitCompletions: number;
+  totalCheckIns: number;
+  days: ProductivityDayData[];
 }

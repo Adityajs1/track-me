@@ -2,190 +2,133 @@
 
 import React from 'react';
 import { ZiffyLogo } from './ZiffyLogo';
-import { Target, CheckCircle2, Calendar, BookOpen, Flame, Plus, Bell, Home } from 'lucide-react';
+import { LayoutDashboard, Target, CheckCircle2, Calendar, BookOpen, Flame, Plus, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 interface NavbarProps {
-  activeTab: 'goals' | 'checkin' | 'timeblock' | 'notes';
-  setActiveTab: (tab: 'goals' | 'checkin' | 'timeblock' | 'notes') => void;
-  onOpenNewGoal: () => void;
-  onOpenLanding: () => void;
-  totalPoints: number;
-  activeStreak: number;
-  unreadRemindersCount?: number;
-  onToggleReminders?: () => void;
+  onOpenNewGoal?: () => void;
+  totalPoints?: number;
+  activeStreak?: number;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  activeTab,
-  setActiveTab,
   onOpenNewGoal,
-  onOpenLanding,
-  totalPoints,
-  activeStreak,
-  unreadRemindersCount = 0,
-  onToggleReminders,
+  totalPoints = 0,
+  activeStreak = 0,
 }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
-  const handleTimeBlockClick = () => {
-    if (!user) {
-      router.push('/login?redirect=/timeblocking');
+  const navLinks = [
+    { name: 'Tracking', href: '/', icon: LayoutDashboard, isActive: pathname === '/' },
+    { name: 'Goals & Habits', href: '/goals-habits', icon: Target, isActive: pathname.startsWith('/goals') },
+    { name: 'Daily Check-in', href: '/daily-check-in', icon: CheckCircle2, isActive: pathname.startsWith('/daily-check-in') || pathname.startsWith('/check') },
+    { name: 'Time-blocking', href: '/time-blocking', icon: Calendar, isActive: pathname.startsWith('/time-blocking') || pathname.startsWith('/timeblocking') },
+    { name: 'Journal', href: '/journal', icon: BookOpen, isActive: pathname.startsWith('/journal') || pathname.startsWith('/notes') },
+  ];
+
+  const handleNav = (href: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user && href !== '/') {
+      router.push(`/login?redirect=${encodeURIComponent(href)}`);
       return;
     }
-    setActiveTab('timeblock');
+    router.push(href);
   };
+
   return (
-    <header className="sticky top-0 z-30 border-b border-[#2E2E2E] bg-[#1B1B1B]/90 backdrop-blur-md text-white">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        {/* Brand with Owl Logo */}
-        <div className="flex items-center gap-8">
-          <button
-            onClick={onOpenLanding}
-            className="flex items-center gap-2 cursor-pointer focus:outline-none"
-          >
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0A0A0A]/90 backdrop-blur-md text-white select-none">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+        {/* Brand */}
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2 cursor-pointer focus:outline-none">
             <ZiffyLogo size="sm" />
-          </button>
+          </Link>
 
-          {/* Navigation Tabs */}
+          {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-1.5">
-            <button
-              onClick={() => setActiveTab('goals')}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                activeTab === 'goals'
-                  ? 'bg-[#232323] text-[#00C2CB] border border-[#2E2E2E]'
-                  : 'text-white/70 hover:bg-[#232323]/50 hover:text-white'
-              }`}
-            >
-              <Target className="h-3.5 w-3.5" />
-              Goals & Habits
-            </button>
-
-            <button
-              onClick={() => setActiveTab('checkin')}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                activeTab === 'checkin'
-                  ? 'bg-[#232323] text-[#00C2CB] border border-[#2E2E2E]'
-                  : 'text-white/70 hover:bg-[#232323]/50 hover:text-white'
-              }`}
-            >
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Daily Check-in
-            </button>
-
-            <button
-              onClick={handleTimeBlockClick}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                activeTab === 'timeblock'
-                  ? 'bg-[#232323] text-[#FF4FA3] border border-[#2E2E2E]'
-                  : 'text-white/70 hover:bg-[#232323]/50 hover:text-white'
-              }`}
-            >
-              <Calendar className="h-3.5 w-3.5" />
-              Time-Blocking
-            </button>
-
-            <button
-              onClick={() => setActiveTab('notes')}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                activeTab === 'notes'
-                  ? 'bg-[#232323] text-[#FF4FA3] border border-[#2E2E2E]'
-                  : 'text-white/70 hover:bg-[#232323]/50 hover:text-white'
-              }`}
-            >
-              <BookOpen className="h-3.5 w-3.5" />
-              Journal
-            </button>
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <button
+                  key={link.href}
+                  onClick={(e) => handleNav(link.href, e)}
+                  className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                    link.isActive
+                      ? 'bg-white text-black shadow-xs'
+                      : 'text-white/70 hover:bg-white/[0.05] hover:text-white'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5 stroke-[1.5]" />
+                  <span>{link.name}</span>
+                </button>
+              );
+            })}
           </nav>
         </div>
 
-        {/* Right Section: Streak, Points & New Goal Action */}
+        {/* Right Section: Streak, Points & New Goal */}
         <div className="flex items-center gap-3">
-          {/* Streak & Points Badges with Bubblegum Pop colors */}
-          <div className="hidden sm:flex items-center gap-2.5 bg-[#232323] px-3.5 py-1.5 rounded-full border border-[#2E2E2E] text-xs">
+          <div className="hidden sm:flex items-center gap-2.5 glass-panel px-3.5 py-1.5 rounded-full text-xs">
             <div className="flex items-center gap-1 text-[#FF4FA3] font-semibold">
               <Flame className="h-3.5 w-3.5 fill-[#FF4FA3]" />
               <span>{activeStreak}d streak</span>
             </div>
-            <span className="text-[#2E2E2E]">|</span>
+            <span className="text-white/20">|</span>
             <div className="text-white/80 font-medium">
               <span className="font-bold text-[#00C2CB]">{totalPoints}</span> pts
             </div>
           </div>
 
-          {/* Reminder Bell */}
-          {onToggleReminders && (
-            <button
-              onClick={onToggleReminders}
-              className="relative p-2 rounded-lg text-white/70 hover:text-white hover:bg-[#232323] transition-colors"
-              title="Notifications & Reminders"
-            >
-              <Bell className="h-4 w-4" />
-              {unreadRemindersCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#FF4FA3] ring-2 ring-[#1B1B1B]" />
+          {user ? (
+            <div className="flex items-center gap-2">
+              {onOpenNewGoal && (
+                <button
+                  onClick={onOpenNewGoal}
+                  className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-white/90 text-black px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <span>New Goal</span>
+                </button>
               )}
+              <button
+                onClick={() => logout()}
+                title="Sign Out"
+                className="p-1.5 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => router.push('/login')}
+              className="flex items-center gap-1.5 rounded-xl bg-white/[0.05] hover:bg-white/10 border border-white/10 text-white/80 hover:text-white px-3.5 py-1.5 text-xs font-medium transition-all cursor-pointer"
+            >
+              <LogIn className="h-3.5 w-3.5" />
+              <span>Sign In</span>
             </button>
           )}
-
-          {/* Create Goal Button */}
-          <button
-            onClick={onOpenNewGoal}
-            className="flex items-center gap-1.5 rounded-xl bg-[#FF4FA3] px-3.5 py-2 text-xs font-bold text-[#1B1B1B] shadow-sm hover:bg-white hover:text-[#1B1B1B] transition-all cursor-pointer"
-          >
-            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>New Goal</span>
-          </button>
         </div>
       </div>
 
-      {/* Mobile Nav */}
-      <div className="flex md:hidden border-t border-[#2E2E2E] px-4 py-2 gap-2 overflow-x-auto bg-[#1B1B1B]">
-        <button
-          onClick={() => setActiveTab('goals')}
-          className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap ${
-            activeTab === 'goals'
-              ? 'bg-[#232323] text-[#00C2CB] border border-[#2E2E2E]'
-              : 'text-white/60'
-          }`}
-        >
-          <Target className="h-3.5 w-3.5" />
-          Goals
-        </button>
-        <button
-          onClick={() => setActiveTab('checkin')}
-          className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap ${
-            activeTab === 'checkin'
-              ? 'bg-[#232323] text-[#00C2CB] border border-[#2E2E2E]'
-              : 'text-white/60'
-          }`}
-        >
-          <CheckCircle2 className="h-3.5 w-3.5" />
-          Check-in
-        </button>
-        <button
-          onClick={handleTimeBlockClick}
-          className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap ${
-            activeTab === 'timeblock'
-              ? 'bg-[#232323] text-[#FF4FA3] border border-[#2E2E2E]'
-              : 'text-white/60'
-          }`}
-        >
-          <Calendar className="h-3.5 w-3.5" />
-          Time-Block
-        </button>
-        <button
-          onClick={() => setActiveTab('notes')}
-          className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap ${
-            activeTab === 'notes'
-              ? 'bg-[#232323] text-[#FF4FA3] border border-[#2E2E2E]'
-              : 'text-white/60'
-          }`}
-        >
-          <BookOpen className="h-3.5 w-3.5" />
-          Journal
-        </button>
+      {/* Mobile Nav Bar */}
+      <div className="flex md:hidden border-t border-white/10 px-4 py-2 gap-2 overflow-x-auto bg-[#0A0A0A]">
+        {navLinks.map((link) => (
+          <button
+            key={link.href}
+            onClick={(e) => handleNav(link.href, e)}
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap cursor-pointer ${
+              link.isActive
+                ? 'bg-white text-black font-semibold'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            <span>{link.name}</span>
+          </button>
+        ))}
       </div>
     </header>
   );

@@ -47,9 +47,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     {
       name: 'Overview & Heatmap',
-      href: '/',
+      href: '/overview',
       icon: LayoutDashboard,
-      isActive: pathname === '/',
+      isActive: pathname.startsWith('/overview') || pathname.startsWith('/dashboard'),
     },
     {
       name: 'Goals & Habits',

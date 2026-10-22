@@ -10,6 +10,8 @@ const PROTECTED_PREFIXES = [
   '/check-in',
   '/journal',
   '/notes',
+  '/overview',
+  '/dashboard',
 ];
 
 export function middleware(request: NextRequest) {
@@ -45,5 +47,9 @@ export const config = {
     '/journal',
     '/notes/:path*',
     '/notes',
+    '/overview/:path*',
+    '/overview',
+    '/dashboard/:path*',
+    '/dashboard',
   ],
 };

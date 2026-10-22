@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { ZiffyLogo } from './ZiffyLogo';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/AuthContext';
 import {
   TrendingUp,
   Calendar,
@@ -12,10 +14,29 @@ import {
 } from 'lucide-react';
 
 interface LandingHeroProps {
-  onGetStarted: () => void;
+  onGetStarted?: () => void;
 }
 
 export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const handleOpenWorkspace = () => {
+    if (onGetStarted) {
+      onGetStarted();
+    } else {
+      router.push(user ? '/overview' : '/login?redirect=/overview');
+    }
+  };
+
+  const handleNav = (path: string) => {
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(path)}`);
+    } else {
+      router.push(path);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-between selection:bg-white selection:text-black">
       {/* 1. Header Navigation (Left links, Center Logo, Right CTA) */}
@@ -24,19 +45,19 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
           {/* Left Navigation */}
           <nav className="flex items-center gap-6 text-xs text-white/50 font-medium">
             <button
-              onClick={onGetStarted}
+              onClick={() => handleNav('/goals-habits')}
               className="hover:text-white transition-colors cursor-pointer"
             >
               Tracking
             </button>
             <button
-              onClick={onGetStarted}
+              onClick={() => handleNav('/time-blocking')}
               className="hover:text-white transition-colors cursor-pointer hidden sm:inline-block"
             >
               Time-blocking
             </button>
             <button
-              onClick={onGetStarted}
+              onClick={() => handleNav('/journal')}
               className="hover:text-white transition-colors cursor-pointer hidden md:inline-block"
             >
               Journal
@@ -45,7 +66,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
 
           {/* Center Brand */}
           <div className="flex justify-center">
-            <button onClick={onGetStarted} className="cursor-pointer focus:outline-none">
+            <button onClick={() => router.push('/')} className="cursor-pointer focus:outline-none">
               <ZiffyLogo size="md" />
             </button>
           </div>
@@ -53,10 +74,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
           {/* Right Action */}
           <div className="flex justify-end">
             <button
-              onClick={onGetStarted}
+              onClick={handleOpenWorkspace}
               className="group flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-white/90 transition-all cursor-pointer shadow-sm"
             >
-              <span>Get started</span>
+              <span>{user ? 'Open workspace' : 'Get started'}</span>
               <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform stroke-[1.5]" />
             </button>
           </div>
@@ -78,7 +99,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
         {/* CTA */}
         <div className="mt-10 flex items-center justify-center gap-4">
           <button
-            onClick={onGetStarted}
+            onClick={handleOpenWorkspace}
             className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-white/90 transition-all cursor-pointer shadow-md hover:scale-[1.02] active:scale-[0.98]"
           >
             <span>Open workspace</span>
@@ -89,7 +110,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
         {/* 3. Four Significantly Enlarged Symmetrical Cards (2x2 Grid) */}
         <div className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-5xl mx-auto w-full">
           {/* Card 1 */}
-          <div className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between">
+          <div
+            onClick={() => handleNav('/overview')}
+            className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between cursor-pointer transition-transform hover:-translate-y-0.5"
+          >
             <div>
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/30 tracking-widest">01</span>
@@ -102,10 +126,17 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
                 GitHub-contributions-style heatmaps computed dynamically from your completion percentage. Resting days never count as missed effort.
               </p>
             </div>
+            <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white">
+              <span>View Heatmap</span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </div>
           </div>
 
           {/* Card 2 */}
-          <div className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between">
+          <div
+            onClick={() => handleNav('/time-blocking')}
+            className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between cursor-pointer transition-transform hover:-translate-y-0.5"
+          >
             <div>
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/30 tracking-widest">02</span>
@@ -118,10 +149,17 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
                 Turn open intentions into concrete commitments by assigning tasks and habits directly to hourly time slots on your day schedule.
               </p>
             </div>
+            <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white">
+              <span>Open Calendar</span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </div>
           </div>
 
           {/* Card 3 */}
-          <div className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between">
+          <div
+            onClick={() => handleNav('/goals-habits')}
+            className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between cursor-pointer transition-transform hover:-translate-y-0.5"
+          >
             <div>
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/30 tracking-widest">03</span>
@@ -134,10 +172,17 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
                 A clean 3-level hierarchy with custom categories and optional time-boxed phases. Everything is authored and structured entirely by you.
               </p>
             </div>
+            <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white">
+              <span>Manage Goals</span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </div>
           </div>
 
           {/* Card 4 */}
-          <div className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between">
+          <div
+            onClick={() => handleNav('/journal')}
+            className="glass-panel glass-panel-hover rounded-2xl p-8 sm:p-10 flex flex-col justify-between cursor-pointer transition-transform hover:-translate-y-0.5"
+          >
             <div>
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/30 tracking-widest">04</span>
@@ -149,6 +194,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               <p className="text-sm text-white/50 mt-3 leading-relaxed">
                 A lightweight reflection journal for insights, obstacle notes, and breakthroughs—scoped to individual goals or written generally.
               </p>
+            </div>
+            <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white">
+              <span>Open Journal</span>
+              <ChevronRight className="h-3.5 w-3.5" />
             </div>
           </div>
         </div>

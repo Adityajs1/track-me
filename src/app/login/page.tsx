@@ -10,7 +10,7 @@ import Link from 'next/link';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get('redirect') || '/timeblocking';
+  const redirectUrl = searchParams.get('redirect') || '/overview';
 
   const { user, isLoading: authLoading, login, register } = useAuth();
 

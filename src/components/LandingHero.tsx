@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ZiffyLogo } from './ZiffyLogo';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
@@ -13,6 +13,8 @@ import {
   ChevronRight,
   LogIn,
   LogOut,
+  Menu,
+  X,
 } from 'lucide-react';
 
 interface LandingHeroProps {
@@ -22,6 +24,7 @@ interface LandingHeroProps {
 export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleOpenWorkspace = () => {
     if (onGetStarted) {
@@ -42,18 +45,95 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-between selection:bg-white selection:text-black">
       {/* 1. Header Navigation */}
-      <header className="mx-auto w-full max-w-7xl px-6 py-6 sm:px-10 sm:py-7">
-        <div className="flex items-center justify-between">
-          {/* Left: Brand with Orange Substack color text (#FF6719) */}
-          <button
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 cursor-pointer focus:outline-none group transition-opacity hover:opacity-90"
-          >
-            <ZiffyLogo size="md" color="text-[#FF6719]" />
-          </button>
+      <header className="mx-auto w-full max-w-7xl px-6 py-6 sm:px-10 sm:py-7 relative z-50">
+        <div className="grid grid-cols-3 items-center">
+          {/* Left: 3 horizontal lines icon with dropdown options */}
+          <div className="flex items-center justify-start relative">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 -ml-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer focus:outline-none flex items-center justify-center"
+              aria-label="Navigation Menu"
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+
+            {/* Dropdown Menu */}
+            {isMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsMenuOpen(false)}
+                />
+                <div className="absolute left-0 top-full mt-2 w-64 rounded-2xl glass-panel bg-black/95 border border-white/15 p-2 shadow-2xl z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-white/40">
+                    Explore Sections
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleNav('/goals-habits');
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all text-left cursor-pointer group"
+                  >
+                    <Layers className="h-4 w-4 text-white/50 group-hover:text-white stroke-[1.5]" />
+                    <div>
+                      <div className="font-semibold text-white">Tracking & Goals</div>
+                      <div className="text-[11px] text-white/40">Goal &rarr; Plan &rarr; Task hierarchy</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleNav('/time-blocking');
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all text-left cursor-pointer group"
+                  >
+                    <Calendar className="h-4 w-4 text-white/50 group-hover:text-white stroke-[1.5]" />
+                    <div>
+                      <div className="font-semibold text-white">Time-blocking</div>
+                      <div className="text-[11px] text-white/40">Hourly schedule & calendar</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleNav('/journal');
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all text-left cursor-pointer group"
+                  >
+                    <BookOpen className="h-4 w-4 text-white/50 group-hover:text-white stroke-[1.5]" />
+                    <div>
+                      <div className="font-semibold text-white">Reflection Journal</div>
+                      <div className="text-[11px] text-white/40">Daily insights & notes</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleNav('/overview');
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all text-left cursor-pointer group border-t border-white/10 mt-1 pt-2.5"
+                  >
+                    <TrendingUp className="h-4 w-4 text-white/50 group-hover:text-white stroke-[1.5]" />
+                    <div>
+                      <div className="font-semibold text-white">Consistency Trends</div>
+                      <div className="text-[11px] text-white/40">Heatmap & effort overview</div>
+                    </div>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Center Brand: White Ziffy Logo */}
+          <div className="flex justify-center">
+            <button onClick={() => router.push('/')} className="cursor-pointer focus:outline-none">
+              <ZiffyLogo size="md" />
+            </button>
+          </div>
 
           {/* Right Action: Log In button (if logged out) or Logged In Icon indicator (if logged in) */}
-          <div className="flex items-center gap-3">
+          <div className="flex justify-end items-center gap-3">
             {user ? (
               <div className="flex items-center gap-2.5">
                 <button
@@ -213,7 +293,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
 
       {/* 4. Minimalist Monochrome Footer */}
       <footer className="mx-auto w-full max-w-7xl px-6 py-8 border-t border-white/10 flex items-center justify-between text-xs text-white/30">
-        <span className="text-[#FF6719] font-medium">ziffy<span className="opacity-50">.</span></span>
+        <span>ziffy.</span>
         <span>Zero hardcoded data · 100% user-driven</span>
       </footer>
     </div>

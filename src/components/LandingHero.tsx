@@ -40,7 +40,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-between selection:bg-white selection:text-black">
       {/* 1. Header Navigation (Left links, Center Logo, Right CTA) */}
-      <header className="mx-auto w-full max-w-7xl px-6 py-8 sm:px-10">
+      <header className="mx-auto w-full max-w-7xl px-6 py-6 sm:px-10 sm:py-7">
         <div className="grid grid-cols-3 items-center">
           {/* Left Navigation */}
           <nav className="flex items-center gap-6 text-xs text-white/50 font-medium">
@@ -85,19 +85,22 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
       </header>
 
       {/* 2. Hero Section with Substantially Enlarged Typography */}
-      <main className="mx-auto w-full max-w-7xl px-6 py-16 sm:py-24 text-center flex-1 flex flex-col justify-center">
+      <main className="mx-auto w-full max-w-7xl px-6 pt-6 pb-16 sm:pt-10 sm:pb-20 text-center flex-1 flex flex-col justify-start sm:justify-center">
         {/* Main Headline (Substantially Enlarged) */}
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-semibold tracking-tight text-white max-w-5xl mx-auto leading-[0.98] sm:leading-[1.02]">
-          Organise you way with Ziffy
+        <h1
+          style={{ fontFamily: '"Times New Roman", Times, serif' }}
+          className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-normal tracking-tight text-white max-w-5xl mx-auto leading-[0.98] sm:leading-[1.02]"
+        >
+          Organise your way with Ziffy
         </h1>
 
         {/* Punchy Subtitle */}
-        <p className="mt-8 text-base sm:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-normal">
+        <p className="mt-6 text-base sm:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-normal">
           A personal productivity system designed to track progress per goal over time. Effort shows as a visible trend, never daily pass or fail.
         </p>
 
         {/* CTA */}
-        <div className="mt-10 flex items-center justify-center gap-4">
+        <div className="mt-8 flex items-center justify-center gap-4">
           <button
             onClick={handleOpenWorkspace}
             className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-white/90 transition-all cursor-pointer shadow-md hover:scale-[1.02] active:scale-[0.98]"
@@ -108,7 +111,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
         </div>
 
         {/* 3. Four Significantly Enlarged Symmetrical Cards (2x2 Grid) */}
-        <div className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-5xl mx-auto w-full">
+        <div className="mt-16 sm:mt-20 grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-5xl mx-auto w-full">
           {/* Card 1 */}
           <div
             onClick={() => handleNav('/overview')}

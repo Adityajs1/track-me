@@ -11,6 +11,8 @@ import {
   BookOpen,
   ArrowRight,
   ChevronRight,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
 
 interface LandingHeroProps {
@@ -19,7 +21,7 @@ interface LandingHeroProps {
 
 export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleOpenWorkspace = () => {
     if (onGetStarted) {
@@ -39,47 +41,50 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-between selection:bg-white selection:text-black">
-      {/* 1. Header Navigation (Left links, Center Logo, Right CTA) */}
+      {/* 1. Header Navigation */}
       <header className="mx-auto w-full max-w-7xl px-6 py-6 sm:px-10 sm:py-7">
-        <div className="grid grid-cols-3 items-center">
-          {/* Left Navigation */}
-          <nav className="flex items-center gap-6 text-xs text-white/50 font-medium">
-            <button
-              onClick={() => handleNav('/goals-habits')}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              Tracking
-            </button>
-            <button
-              onClick={() => handleNav('/time-blocking')}
-              className="hover:text-white transition-colors cursor-pointer hidden sm:inline-block"
-            >
-              Time-blocking
-            </button>
-            <button
-              onClick={() => handleNav('/journal')}
-              className="hover:text-white transition-colors cursor-pointer hidden md:inline-block"
-            >
-              Journal
-            </button>
-          </nav>
+        <div className="flex items-center justify-between">
+          {/* Left: Brand with Orange Substack color text (#FF6719) */}
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 cursor-pointer focus:outline-none group transition-opacity hover:opacity-90"
+          >
+            <ZiffyLogo size="md" color="text-[#FF6719]" />
+          </button>
 
-          {/* Center Brand */}
-          <div className="flex justify-center">
-            <button onClick={() => router.push('/')} className="cursor-pointer focus:outline-none">
-              <ZiffyLogo size="md" />
-            </button>
-          </div>
+          {/* Right Action: Log In button (if logged out) or Logged In Icon indicator (if logged in) */}
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => router.push('/overview')}
+                  title={`Logged in as ${user.name || user.email} · Open workspace`}
+                  className="relative flex items-center justify-center h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 transition-all cursor-pointer focus:outline-none group shadow-xs"
+                >
+                  <span className="text-xs font-bold text-white font-mono">
+                    {(user.name || user.email || 'U')[0].toUpperCase()}
+                  </span>
+                  {/* Presence indicator showing active logged-in state */}
+                  <span className="absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-black" />
+                </button>
 
-          {/* Right Action */}
-          <div className="flex justify-end">
-            <button
-              onClick={handleOpenWorkspace}
-              className="group flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-white/90 transition-all cursor-pointer shadow-sm"
-            >
-              <span>{user ? 'Open workspace' : 'Get started'}</span>
-              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform stroke-[1.5]" />
-            </button>
+                <button
+                  onClick={() => logout()}
+                  title="Sign out"
+                  className="p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => router.push('/login')}
+                className="group flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-white/90 transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <LogIn className="h-3.5 w-3.5 stroke-[2]" />
+                <span>Log in</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -105,7 +110,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
             onClick={handleOpenWorkspace}
             className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-white/90 transition-all cursor-pointer shadow-md hover:scale-[1.02] active:scale-[0.98]"
           >
-            <span>Open workspace</span>
+            <span>{user ? 'Open workspace' : 'Log in to workspace'}</span>
             <ChevronRight className="h-4 w-4 stroke-[2]" />
           </button>
         </div>
@@ -208,7 +213,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
 
       {/* 4. Minimalist Monochrome Footer */}
       <footer className="mx-auto w-full max-w-7xl px-6 py-8 border-t border-white/10 flex items-center justify-between text-xs text-white/30">
-        <span>ziffy.</span>
+        <span className="text-[#FF6719] font-medium">ziffy<span className="opacity-50">.</span></span>
         <span>Zero hardcoded data · 100% user-driven</span>
       </footer>
     </div>

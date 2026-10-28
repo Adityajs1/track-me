@@ -5,11 +5,13 @@ import React from 'react';
 interface ZiffyLogoProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  color?: string;
 }
 
 export const ZiffyLogo: React.FC<ZiffyLogoProps> = ({
   className = '',
   size = 'md',
+  color,
 }) => {
   const textSizes = {
     sm: 'text-base font-semibold tracking-tight',
@@ -17,10 +19,12 @@ export const ZiffyLogo: React.FC<ZiffyLogoProps> = ({
     lg: 'text-3xl font-bold tracking-tight',
   };
 
+  const colorClass = color || (className.includes('text-') ? '' : 'text-white');
+
   return (
-    <div className={`inline-flex items-center select-none text-white ${className}`}>
+    <div className={`inline-flex items-center select-none ${colorClass} ${className}`}>
       <span className={textSizes[size]}>
-        ziffy<span className="text-white/40">.</span>
+        ziffy<span className="opacity-50">.</span>
       </span>
     </div>
   );

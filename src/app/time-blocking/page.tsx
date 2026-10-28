@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import useSWR from 'swr';
-import { GoalData, TaskData } from '@/lib/types';
-import { Sidebar } from '@/components/Sidebar';
+import { AppHeader } from '@/components/AppHeader';
 import { TimeBlockingView } from '@/components/TimeBlockingView';
 import { CreateGoalModal } from '@/components/Modal';
 import { Loader2 } from 'lucide-react';
@@ -68,22 +67,16 @@ export default function TimeBlockingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
-      {/* Sidebar with activeTab highlighting */}
-      <Sidebar
-        activeTab="timeblock"
-        setActiveTab={() => {}}
-        goals={goals}
-        selectedGoalId={null}
-        onSelectGoal={(g) => router.push(`/goals-habits?goal=${g.id}`)}
-        onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
-        onOpenLanding={() => router.push('/')}
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-white selection:text-black">
+      {/* App Header with 3-line menu, Ziffy logo, and user stats */}
+      <AppHeader
         totalPoints={totalPoints}
         activeStreak={activeStreak}
+        onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto h-screen">
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <main className="flex-1 px-4 sm:px-8 py-8 max-w-7xl w-full mx-auto">
           <TimeBlockingView
             tasks={dailyTasks}

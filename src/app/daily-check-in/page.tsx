@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { TaskData, GoalData, DailyCheckInData } from '@/lib/types';
 import { useAuth } from '@/lib/AuthContext';
-import { useRouter } from 'next/navigation';
-import { Sidebar } from '@/components/Sidebar';
+import { AppHeader } from '@/components/AppHeader';
 import { CreateGoalModal } from '@/components/Modal';
 import {
   CheckCircle2,
@@ -134,22 +133,16 @@ export default function DailyCheckInPage() {
   const moodOptions = ['Great', 'Focused', 'Steady', 'Tired', 'Challenging'];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
-      {/* Sidebar with active tab */}
-      <Sidebar
-        activeTab="checkin"
-        setActiveTab={() => {}}
-        goals={goals}
-        selectedGoalId={null}
-        onSelectGoal={(g) => router.push(`/goals-habits?goal=${g.id}`)}
-        onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
-        onOpenLanding={() => router.push('/')}
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-white selection:text-black">
+      {/* App Header with 3-line menu, Ziffy logo, and user stats */}
+      <AppHeader
         totalPoints={totalPoints}
         activeStreak={activeStreak}
+        onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto h-screen">
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <main className="flex-1 px-4 sm:px-8 py-8 max-w-4xl w-full mx-auto space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">

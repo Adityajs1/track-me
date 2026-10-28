@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import useSWR from 'swr';
 import { NoteData, GoalData } from '@/lib/types';
 import { useAuth } from '@/lib/AuthContext';
-import { useRouter } from 'next/navigation';
-import { Sidebar } from '@/components/Sidebar';
+import { AppHeader } from '@/components/AppHeader';
 import { CreateGoalModal } from '@/components/Modal';
 import {
   BookOpen,
@@ -138,22 +137,16 @@ export default function JournalPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
-      {/* Sidebar with active tab */}
-      <Sidebar
-        activeTab="notes"
-        setActiveTab={() => {}}
-        goals={goals}
-        selectedGoalId={null}
-        onSelectGoal={(g) => router.push(`/goals-habits?goal=${g.id}`)}
-        onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
-        onOpenLanding={() => router.push('/')}
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-white selection:text-black">
+      {/* App Header with 3-line menu, Ziffy logo, and user stats */}
+      <AppHeader
         totalPoints={totalPoints}
         activeStreak={activeStreak}
+        onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto h-screen">
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <main className="flex-1 px-4 sm:px-8 py-8 max-w-5xl w-full mx-auto space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">

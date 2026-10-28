@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import useSWR from 'swr';
 import { GoalData, TaskData } from '@/lib/types';
 import { useAuth } from '@/lib/AuthContext';
-import { useRouter } from 'next/navigation';
-import { Sidebar } from '@/components/Sidebar';
+import { AppHeader } from '@/components/AppHeader';
 import { GoalDetailView } from '@/components/GoalDetailView';
 import { CreateGoalModal } from '@/components/Modal';
 import {
@@ -191,22 +190,16 @@ export default function GoalsAndHabitsPage() {
   const completedGoalsCount = goals.filter((g) => g.isCompleted).length;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex font-sans selection:bg-white selection:text-black">
-      {/* Global Sidebar with proper route highlighting */}
-      <Sidebar
-        activeTab="goals"
-        setActiveTab={() => {}}
-        goals={goals}
-        selectedGoalId={selectedGoal?.id || null}
-        onSelectGoal={(g) => setSelectedGoal(g)}
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-white selection:text-black">
+      {/* App Header with 3-line menu, Ziffy logo, and user stats */}
+      <AppHeader
         onOpenNewGoal={() => setIsNewGoalModalOpen(true)}
-        onOpenLanding={() => router.push('/')}
         totalPoints={totalPoints}
         activeStreak={activeStreak}
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto h-screen">
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <main className="flex-1 px-4 sm:px-8 py-8 max-w-6xl w-full mx-auto space-y-6">
           {selectedGoal ? (
             <GoalDetailView
